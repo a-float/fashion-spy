@@ -1,8 +1,9 @@
-import { Elysia } from "elysia";
+import { Elysia, file } from "elysia";
 import { renderToReadableStream } from "react-dom/server";
 import App from "./ui/App";
 import { createElement } from "react";
 import { staticPlugin } from "@elysiajs/static";
+import { authPlugin } from "plugins/user";
 
 await Bun.build({
   entrypoints: ["./src/ui/bootstrap.tsx"],
@@ -12,8 +13,9 @@ await Bun.build({
 
 const app = new Elysia()
   .use(staticPlugin())
-  .get("/", () => "Hello Elysia")
-  .get("/react", async () => {
+  .get("/favicon.ico", () => file("public/favicon.ico"))
+  .group("/api", (app) => app.use(authPlugin))
+  .get("/", async () => {
     const page = createElement(App);
     const stream = await renderToReadableStream(page, {
       bootstrapModules: ["/public/bootstrap.js"],
