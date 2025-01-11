@@ -3,5 +3,7 @@
 
 import { hydrateRoot } from "react-dom/client";
 import App from "./App";
+import "@mantine/core/styles.css";
 
-hydrateRoot(document, <App />);
+console.log("hydrating with ", window.__INITIAL_DATA__);
+hydrateRoot(document, <App {...window.__INITIAL_DATA__} />);
