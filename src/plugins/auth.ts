@@ -5,8 +5,8 @@ import { Value } from "@sinclair/typebox/value";
 
 const userModel = t.Object({
   id: t.Number(),
-  email: t.String(),
-  password: t.String(),
+  email: t.String({ minLength: 1 }),
+  password: t.String({ minLength: 1 }),
 });
 
 const publicUser = t.Nullable(t.Pick(userModel, ["email"]));
@@ -16,9 +16,8 @@ const userModels = {
   signIn: t.Pick(userModel, ["email", "password"]),
 };
 
-export const authPlugin = new Elysia({ name: "auth" })
-  .model(userModels)
-  .resolve({ as: "global" }, async ({ cookie: { token } }) => {
+const getUser = new Elysia()
+  .resolve(async ({ cookie: { token } }) => {
     if (!token.value) return { user: null };
     const session = await db.query.sessions.findFirst({
       where: eq(table.sessions.id, parseInt(token.value)),
@@ -26,8 +25,23 @@ export const authPlugin = new Elysia({ name: "auth" })
         user: true,
       },
     });
+    if (!session) token.remove();
     return { user: session?.user ?? null };
   })
+  .as("global");
+
+export const getUserMacro = new Elysia().use(getUser).macro({
+  isLoggedIn: (_enabled: true) => ({
+    resolve: ({ user }) => {
+      if (!user) throw new Error("No user");
+      return { user };
+    },
+  }),
+});
+
+export const authPlugin = new Elysia({ name: "auth" })
+  .model(userModels)
+  .use(getUser)
   .group("/api", (app) =>
     app
       .post(
@@ -69,5 +83,7 @@ export const authPlugin = new Elysia({ name: "auth" })
         if (token) token.remove();
         return "ok";
       })
-      .get("/profile", ({ user }) => Value.Cast(publicUser, user))
+      .get("/profile", ({ user }) => {
+        return Value.Cast(publicUser, user);
+      })
   );

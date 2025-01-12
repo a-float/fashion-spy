@@ -1,9 +1,9 @@
 import { Elysia, file } from "elysia";
 import { renderToReadableStream } from "react-dom/server";
 import App from "./ui/App";
-import { createElement } from "react";
 import { staticPlugin } from "@elysiajs/static";
-import { authPlugin } from "plugins/user";
+import { authPlugin } from "plugins/auth";
+import { itemsPlugin } from "plugins/items";
 
 await Bun.build({
   entrypoints: ["./src/ui/bootstrap.tsx"],
@@ -15,6 +15,7 @@ const app = new Elysia()
   .use(staticPlugin())
   .get("/favicon.ico", () => file("public/favicon.ico"))
   .use(authPlugin)
+  .use(itemsPlugin)
   .get("/", async ({ user }) => {
     const ssrProps = { user: user ? { email: user.email } : null };
     const app = <App {...ssrProps} />;
