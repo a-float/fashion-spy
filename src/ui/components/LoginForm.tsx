@@ -6,7 +6,7 @@ const LoginForm = () => {
   const { loginMutation, signUpMutation } = useUser();
 
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       email: "",
       password: "",

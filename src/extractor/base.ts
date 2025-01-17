@@ -29,8 +29,9 @@ export abstract class BaseExtractor {
     if (!imgSrc) throw new Error("Could not find an image");
     const imgExt = new URL(imgSrc).pathname.split(".").at(-1);
     const hash = `${Bun.hash(imgSrc)}`;
-    const imgFile = Bun.file(`./data/${hash}.${imgExt}`);
+    const imgFile = Bun.file(`./public/img/${hash}.${imgExt}`);
 
+    // TODO do not save img if other things are not ready
     if (!(await imgFile.exists())) {
       console.log(`Fetching img from ${imgSrc}`);
       const imgRes = await fetch(imgSrc);

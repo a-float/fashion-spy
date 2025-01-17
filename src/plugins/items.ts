@@ -19,7 +19,12 @@ const fetchItemData = async (url: string) => {
     return await extractor.extractData(await cachedHtml.text());
   } else {
     console.log(`Fetching response for ${url}`);
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
+      },
+    });
     if (!res.ok) throw new Error(`Page returned ${res.status}`);
     const html = await res.text();
     Bun.write(cachedHtml, html);
@@ -33,9 +38,9 @@ export const itemsPlugin = new Elysia({ name: "items" })
     app
       .get(
         "/",
-        ({ user }) => {
-          const userItems = db.query.items.findMany({
-            where: eq(table.items.id, user.id),
+        async ({ user }) => {
+          const userItems = await db.query.items.findMany({
+            where: eq(table.items.ownerId, user.id),
             with: { status: true },
           });
           return userItems;
@@ -51,10 +56,11 @@ export const itemsPlugin = new Elysia({ name: "items" })
               eq(table.items.url, url)
             ),
           });
-          console.log({ item });
+          console.log({ itemInDb: item });
           if (item) return error(400, "Item already exists");
 
           const data = await fetchItemData(url);
+          console.log({ data });
           await db.transaction(async (tx) => {
             const [item] = await tx
               .insert(table.items)
@@ -92,7 +98,10 @@ export const itemsPlugin = new Elysia({ name: "items" })
               )
             )
             .returning({ image: table.items.imagePath });
-          await fs.rmSync(item.image);
+          // TODO use Bun when possible
+          console.log("removing image", item.image);
+          if (fs.existsSync(item.image)) await fs.rmSync(item.image);
+          return { ok: true };
         },
         {
           isLoggedIn: true,

@@ -4,7 +4,8 @@ import { eden } from "ui/eden";
 
 export function useUser() {
   const userQuery = useQuery({
-    queryKey: [],
+    queryKey: ["auth"],
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       const res = await eden.api.profile.get();
       if (res.error) throw res.error;

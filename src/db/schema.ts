@@ -60,7 +60,7 @@ export const itemStatus = sqliteTable("item_status", {
   id: int().primaryKey(),
   itemId: int()
     .notNull()
-    .references(() => items.id),
+    .references(() => items.id, { onDelete: "cascade" }),
   amount: int().notNull(),
   currency: text().notNull(),
   available: int().notNull().default(1),

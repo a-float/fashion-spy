@@ -3,7 +3,7 @@ import { CheerioAPI } from "cheerio";
 
 export class ZaraExtractor extends BaseExtractor {
   appliesTo(url: string): boolean {
-    return /^https:\/\/(www\.)?zara\.com\.*/.test(url);
+    return /^https:\/\/(www\.)?zara\.com\/.*/.test(url);
   }
 
   getStoreName(): string {
@@ -11,17 +11,19 @@ export class ZaraExtractor extends BaseExtractor {
   }
 
   getName($: CheerioAPI): string {
-    return $(`[data-qa-qualifier="product-detail-info-name"]`).text();
+    return $(".product-detail-card-info__name").text();
   }
 
   getImgSrc($: CheerioAPI): string {
-    return $(`.product-detail-view__main-content img`).attr("src")!;
+    return $(`.media-image img`).attr("src")!;
   }
 
   getPriceString($: CheerioAPI): string {
-    return $(
-      `.product-detail-info__price [data-qa-qualifier="price-amount-current"]`
-    ).text();
+    const x = $("html")
+      .find(`[data-qa-qualifier="price-amount-current"]`)
+      .text();
+    console.log({ x });
+    return x;
   }
 
   getMeta($: CheerioAPI) {
