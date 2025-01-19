@@ -19,7 +19,7 @@ export class HmExtractor extends Extractor {
   }
 
   getPriceString($: CheerioAPI): string {
-    return "10.10 PLN";
+    return $(`h1`).parent().next().next().text();
   }
 
   getMeta($: CheerioAPI) {

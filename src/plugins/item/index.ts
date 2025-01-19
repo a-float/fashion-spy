@@ -3,12 +3,19 @@ import { authPlugin } from "plugins/auth";
 import { VintedExtractor } from "./extractors/vinted";
 import { ZaraExtractor } from "./extractors/zara";
 import { ItemService } from "./item.service";
+import { ReservedExtractor } from "./extractors/reserved";
+import { HmExtractor } from "./extractors/hm";
 
-export const itemPlugin = new Elysia({ name: "item",  })
+export const itemPlugin = new Elysia({ name: "item" })
   .use(authPlugin)
   .state(
     "ItemService",
-    new ItemService([new VintedExtractor(), new ZaraExtractor()])
+    new ItemService([
+      new VintedExtractor(),
+      new ZaraExtractor(),
+      new HmExtractor(),
+      new ReservedExtractor(),
+    ])
   )
   .get("/item_test", () => "test")
   .group("/api/item", (app) =>
