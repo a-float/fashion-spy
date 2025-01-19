@@ -1,10 +1,14 @@
 import { db, table } from "db";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Extractor } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
   NoApplicableExtractorError,
 } from "./item.errors";
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export class ItemService {
   constructor(private extractors: Extractor[]) {}
@@ -15,7 +19,8 @@ export class ItemService {
 
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 
-    if (await cachedHtml.exists()) {
+    const onDev = process.env.BUN_ENV === "dev";
+    if (!onDev && (await cachedHtml.exists())) {
       console.log(`Using cached response for ${url}`);
       return await extractor.extractData(await cachedHtml.text());
     } else {
@@ -36,6 +41,39 @@ export class ItemService {
       Bun.write(cachedHtml, html);
       return await extractor.extractData(html);
     }
+  }
+
+  async updateAllItemStatus() {
+    // TODO use a logger with time
+    const items = await this.getAllItems();
+    console.log(`Starting update of ${items.length} items at ...`);
+    for (const item of items.filter((item) => !item.hidden)) {
+      await this.fetchItemData(item.url)
+        .then((data) => {
+          const lastStatus = item.status.at(-1)!;
+          // do not add new item if nothing has changed
+          return lastStatus.amount !== data.amount
+            ? db.insert(table.itemStatus).values({
+                itemId: item.id,
+                amount: data.amount,
+                currency: data.currency,
+              })
+            : db.update(table.itemStatus).set({
+                updated_at: sql`(current_timestamp)`,
+              });
+        })
+        .catch((err) => {
+          console.log(`Failed to update item[id=${item.id}], ${err}`);
+          db.insert(table.itemStatus).values({
+            itemId: item.id,
+            amount: null,
+            currency: null,
+          });
+        });
+      // simple rate limiting
+      sleep(1000 + Math.random() * 1000);
+    }
+    console.log(`Update done`);
   }
 
   async deleteItem(userId: number, itemId: number) {
@@ -76,11 +114,14 @@ export class ItemService {
     });
   }
 
-  async getAllItems(userId: number) {
-    const userItems = await db.query.items.findMany({
+  private async getAllItems() {
+    return await db.query.items.findMany({ with: { status: true } });
+  }
+
+  async getAllUserItems(userId: number) {
+    return await db.query.items.findMany({
       where: eq(table.items.ownerId, userId),
       with: { status: true },
     });
-    return userItems;
   }
 }

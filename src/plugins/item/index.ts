@@ -5,6 +5,7 @@ import { ZaraExtractor } from "./extractors/zara";
 import { ItemService } from "./item.service";
 import { ReservedExtractor } from "./extractors/reserved";
 import { HmExtractor } from "./extractors/hm";
+import { Cron } from "croner";
 
 export const itemPlugin = new Elysia({ name: "item" })
   .use(authPlugin)
@@ -17,12 +18,25 @@ export const itemPlugin = new Elysia({ name: "item" })
       new ReservedExtractor(),
     ])
   )
+
+  .state((store) => ({
+    ...store,
+    cron: {
+      updateStatus: new Cron("0 */2 * * *", () => {
+        store.ItemService.updateAllItemStatus();
+      }),
+    },
+  }))
   .get("/item_test", () => "test")
   .group("/api/item", (app) =>
     app
+      .get("/status", ({ store }) => ({
+        msToNext: store.cron.updateStatus.msToNext(),
+      }))
       .get(
         "/",
-        async ({ store, user }) => await store.ItemService.getAllItems(user.id),
+        async ({ store, user }) =>
+          await store.ItemService.getAllUserItems(user.id),
         { isLoggedIn: true }
       )
       .post(

@@ -61,10 +61,10 @@ export const itemStatus = sqliteTable("item_status", {
   itemId: int()
     .notNull()
     .references(() => items.id, { onDelete: "cascade" }),
-  amount: int().notNull(),
-  currency: text().notNull(),
-  available: int().notNull().default(1),
+  amount: int(),
+  currency: text(),
   created_at: currentTime(),
+  updated_at: currentTime(),
 });
 
 export const itemStatusRelations = relations(itemStatus, ({ one }) => ({

@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Group, Image, Text } from "@mantine/core";
+import { Badge, Button, Card, Group, Image, Space, Text } from "@mantine/core";
 import React from "react";
 import { eden } from "ui/eden";
 
@@ -14,14 +14,16 @@ const ItemCard = (props: ItemCardProps) => {
   const color = props.store === "Vinted" ? "teal" : "dark";
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card shadow="sm" padding="lg" radius="md" withBorder h="100%">
       <Card.Section>
         <Image src={`${props.imagePath}`} height={320} alt="" />
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
         <Text fw={500}>
-          {`${lastStatus.amount / 100} ${lastStatus.currency}`}
+          {lastStatus.amount && lastStatus.currency
+            ? `${lastStatus.amount / 100} ${lastStatus.currency}`
+            : "Not available"}
         </Text>
         <Badge color={color}>{props.store}</Badge>
       </Group>
@@ -31,9 +33,10 @@ const ItemCard = (props: ItemCardProps) => {
         <br /> {lastStatus.created_at}
       </Text>
 
-      <Text size="sm" c="dimmed">
+      <Text size="sm" c="dimmed" lineClamp={3}>
         {props.name}
       </Text>
+      <Space display="flex" flex={1} />
 
       <Group justify="space-between">
         <Button
