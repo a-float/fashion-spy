@@ -1,7 +1,7 @@
-import { BaseExtractor } from "./base";
+import { Extractor } from "./base";
 import { CheerioAPI } from "cheerio";
 
-export class HmExtractor extends BaseExtractor {
+export class HmExtractor extends Extractor {
   appliesTo(url: string): boolean {
     return /^https:\/\/www2\.hm\.com\/.*/.test(url);
   }

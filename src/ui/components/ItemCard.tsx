@@ -3,7 +3,7 @@ import React from "react";
 import { eden } from "ui/eden";
 
 type ItemCardProps = NonNullable<
-  Awaited<ReturnType<typeof eden.api.items.index.get>>["data"]
+  Awaited<ReturnType<typeof eden.api.item.index.get>>["data"]
 >[number] & {
   handleDelete: (itemId: number) => Promise<void>;
 };

@@ -9,7 +9,7 @@ type ItemData = {
   meta?: Record<string, unknown>;
 };
 
-export abstract class BaseExtractor {
+export abstract class Extractor {
   abstract appliesTo(url: string): boolean;
   abstract getStoreName(): string;
 

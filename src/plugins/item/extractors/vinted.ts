@@ -1,7 +1,7 @@
-import { BaseExtractor } from "./base";
+import { Extractor } from "./base";
 import { CheerioAPI } from "cheerio";
 
-export class VintedExtractor extends BaseExtractor {
+export class VintedExtractor extends Extractor {
   appliesTo(url: string): boolean {
     return /^https:\/\/(www\.)?vinted\..*/.test(url);
   }

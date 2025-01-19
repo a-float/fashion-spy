@@ -1,7 +1,7 @@
-import { BaseExtractor } from "./base";
+import { Extractor } from "./base";
 import { CheerioAPI } from "cheerio";
 
-export class ZaraExtractor extends BaseExtractor {
+export class ZaraExtractor extends Extractor {
   appliesTo(url: string): boolean {
     return /^https:\/\/(www\.)?zara\.com\/.*/.test(url);
   }
@@ -22,7 +22,6 @@ export class ZaraExtractor extends BaseExtractor {
     const x = $("html")
       .find(`[data-qa-qualifier="price-amount-current"]`)
       .text();
-    console.log({ x });
     return x;
   }
 

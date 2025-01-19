@@ -16,7 +16,7 @@ const Homepage = () => {
   const itemsQuery = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const res = await eden.api.items.index.get();
+      const res = await eden.api.item.index.get();
       if (res.error) throw res.error;
       return res.data;
     },
@@ -25,7 +25,7 @@ const Homepage = () => {
 
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      await eden.api.items.index.delete({ itemId });
+      await eden.api.item({ itemId }).delete();
     },
     onSuccess: () => itemsQuery.refetch(),
   });

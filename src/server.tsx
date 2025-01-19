@@ -2,8 +2,7 @@ import { Elysia, file } from "elysia";
 import { renderToReadableStream } from "react-dom/server";
 import App from "./ui/App";
 import { staticPlugin } from "@elysiajs/static";
-import { authPlugin } from "plugins/auth";
-import { itemsPlugin } from "plugins/items";
+import { itemPlugin } from "plugins/item";
 
 await Bun.build({
   entrypoints: ["./src/ui/bootstrap.tsx"],
@@ -13,9 +12,10 @@ await Bun.build({
 
 const app = new Elysia()
   .use(staticPlugin())
+  // TODO why auth routes ignored when item plugin registered
+  // .use(authPlugin)
+  .use(itemPlugin)
   .get("/favicon.ico", () => file("public/favicon.ico"))
-  .use(authPlugin)
-  .use(itemsPlugin)
   .get("/", async ({ user }) => {
     const ssrProps = { user: user ? { email: user.email } : null };
     const app = <App {...ssrProps} />;

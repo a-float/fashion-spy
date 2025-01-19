@@ -17,7 +17,7 @@ const ItemSearchBar = () => {
 
   const addItemMutation = useMutation({
     mutationFn: async (variables: typeof form.values) => {
-      await eden.api.items.index.post({ url: variables.url });
+      await eden.api.item.index.post({ url: variables.url });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
   });
