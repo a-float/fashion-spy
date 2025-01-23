@@ -11,7 +11,6 @@ const LoginForm = () => {
       email: "",
       password: "",
     },
-
     validate: {
       // email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       // password: (value) =>

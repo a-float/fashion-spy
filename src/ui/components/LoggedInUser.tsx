@@ -1,9 +1,8 @@
-import React from "react";
-import { Group, Avatar, Text, Menu, UnstyledButton } from "@mantine/core";
-import { IconChevronDown, IconLogout, IconSettings } from "@tabler/icons-react";
+import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
+import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useUser } from "ui/hooks/useUser";
 
-function LoggedInUser() {
+const LoggedInUser = () => {
   const { user, logoutMutation } = useUser();
 
   if (!user) return null;
@@ -13,12 +12,9 @@ function LoggedInUser() {
       <Menu.Target>
         <UnstyledButton>
           <Group gap="xs">
-            <Avatar radius="xl" size="md">
-              {user.email[0].toUpperCase()}
-            </Avatar>
             <div>
-              <Text size="xs" c="dimmed">
-                {user.email}
+              <Text size="md" c="dimmed">
+                {user.email.split("@")[0]}
               </Text>
             </div>
             <IconChevronDown size={16} />
@@ -27,7 +23,6 @@ function LoggedInUser() {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item leftSection={<IconSettings size={16} />}>Settings</Menu.Item>
         <Menu.Item
           leftSection={<IconLogout size={16} />}
           color="red"
@@ -38,6 +33,6 @@ function LoggedInUser() {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};
 
 export default LoggedInUser;

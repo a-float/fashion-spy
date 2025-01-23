@@ -1,4 +1,4 @@
-import { Button, Group, TextInput } from "@mantine/core";
+import { Button, Group, TextInput, useProps } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
@@ -8,8 +8,17 @@ const ItemSearchBar = () => {
     initialValues: {
       url: "",
     },
+    onValuesChange: () => addItemMutation.reset(),
     validate: {
-      url: (value) => (value.length > 0 ? null : "Required"),
+      url: (value) => {
+        if (value === "") return null;
+        try {
+          new URL(value);
+          return null;
+        } catch (e) {
+          return "Invalid item url.";
+        }
+      },
     },
   });
 
@@ -17,9 +26,14 @@ const ItemSearchBar = () => {
 
   const addItemMutation = useMutation({
     mutationFn: async (variables: typeof form.values) => {
-      await eden.api.item.index.post({ url: variables.url });
+      const res = await eden.api.item.index.post({ url: variables.url });
+      if (res.error) throw res.error;
+      return res.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
+    onSuccess: () => {
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+    },
   });
 
   return (
@@ -28,14 +42,18 @@ const ItemSearchBar = () => {
         <TextInput
           flex={1}
           label="Item url"
+          autoComplete="off"
           placeholder="https://yout-favourite-online-shop/item/12341"
           required
           {...form.getInputProps("url")}
+          error={form.errors.url || addItemMutation.error?.message}
         />
         <Button
           type="submit"
-          disabled={!form.isValid()}
+          disabled={form.values.url.length > 0}
           loading={addItemMutation.isPending}
+          variant="gradient"
+          gradient={{ from: "blue", to: "grape", deg: 145 }}
         >
           Add
         </Button>

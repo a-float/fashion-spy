@@ -1,4 +1,3 @@
-import React from "react";
 import Html from "./components/Html";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +9,7 @@ const App = (props: AppProps) => {
 
   return (
     <Html>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={theme} defaultColorScheme="dark">
         <QueryClientProvider client={new QueryClient()}>
           <Homepage />
         </QueryClientProvider>

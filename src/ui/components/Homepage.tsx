@@ -1,6 +1,14 @@
-import React from "react";
-import { AppShell, Burger, Button, Grid, Group, Space } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+  ActionIcon,
+  AppShell,
+  Box,
+  Grid,
+  Group,
+  Space,
+  Text,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from "@mantine/core";
 import LoggedInUser from "../components/LoggedInUser";
 import { useUser } from "ui/hooks/useUser";
 import LoginForm from "./LoginForm";
@@ -8,10 +16,15 @@ import ItemSearchBar from "./ItemSearchBar";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
 import ItemCard from "./ItemCard";
+import { IconSun, IconMoon } from "@tabler/icons-react";
 
 const Homepage = () => {
-  const [opened, { toggle }] = useDisclosure();
   const { user } = useUser();
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light");
+  const toggleColorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
+  };
 
   const itemsQuery = useQuery({
     queryKey: ["items"],
@@ -31,24 +44,34 @@ const Homepage = () => {
   });
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      // navbar={{
-      //   width: 300,
-      //   breakpoint: "sm",
-      //   collapsed: { mobile: !opened },
-      // }}
-      padding="md"
-    >
+    <AppShell header={{ height: 60 }} maw={1440} mx="auto" padding="md">
       <AppShell.Header>
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <Group justify="space-between" px="lg" align="center" h="100%">
-          <div>Logo</div>
+          <Text
+            size="xl"
+            fw={900}
+            variant="gradient"
+            gradient={{ from: "blue", to: "grape", deg: 145 }}
+          >
+            Fashion Spy
+          </Text>
+          <Box flex="1" />
+          <ActionIcon
+            onClick={toggleColorScheme}
+            color="gray"
+            variant="transparent"
+            size="md"
+            aria-label="Toggle color scheme"
+          >
+            {computedColorScheme === "dark" ? (
+              <IconSun stroke={1.5} />
+            ) : (
+              <IconMoon stroke={1.5} />
+            )}
+          </ActionIcon>
           <LoggedInUser />
         </Group>
       </AppShell.Header>
-
-      {/* <AppShell.Navbar p="md">Navbar</AppShell.Navbar> */}
 
       <AppShell.Main>
         {!user ? (
@@ -61,7 +84,7 @@ const Homepage = () => {
               {itemsQuery.data?.map((item) => (
                 <Grid.Col
                   key={item.id}
-                  span={{ base: 12, xs: 6, md: 4, lg: 3 }}
+                  span={{ base: 6, xs: 4, md: 3, lg: 2.4 }}
                 >
                   <ItemCard
                     {...item}

@@ -1,4 +1,3 @@
-import React from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
 
@@ -25,7 +24,7 @@ export function useUser() {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: async () => await eden.api.logout.post(),
+    mutationFn: async () => await eden.api.logout.get(),
     onSuccess: () => userQuery.refetch(),
   });
 

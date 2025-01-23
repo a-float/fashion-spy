@@ -1,5 +1,4 @@
 import React from "react";
-import { ColorSchemeScript } from "@mantine/core";
 
 type HtmlProps = {
   children?: React.ReactNode;
