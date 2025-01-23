@@ -10,8 +10,8 @@ export class ReservedExtractor extends Extractor {
     return /^https:\/\/(www\.)?reserved\.com\/.*/.test(url);
   }
 
-  getStoreName(): string {
-    return "Reserved";
+  getStoreName() {
+    return "Reserved" as const;
   }
 
   // TODO store description?

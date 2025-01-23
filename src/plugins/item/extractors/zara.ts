@@ -6,12 +6,12 @@ export class ZaraExtractor extends Extractor {
     return /^https:\/\/(www\.)?zara\.com\/.*/.test(url);
   }
 
-  getStoreName(): string {
-    return "Zara";
+  getStoreName() {
+    return "Zara" as const;
   }
 
   getName($: CheerioAPI): string {
-    return $(".product-detail-card-info__name").text();
+    return $("title").text().split("|")[0].trim();
   }
 
   getImgSrc($: CheerioAPI): string {

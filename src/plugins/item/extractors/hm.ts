@@ -6,8 +6,8 @@ export class HmExtractor extends Extractor {
     return /^https:\/\/www2\.hm\.com\/.*/.test(url);
   }
 
-  getStoreName(): string {
-    return "H&M";
+  getStoreName() {
+    return "H&M" as const;
   }
 
   getName($: CheerioAPI): string {

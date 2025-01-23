@@ -18,7 +18,6 @@ export const itemPlugin = new Elysia({ name: "item" })
       new ReservedExtractor(),
     ])
   )
-
   .state((store) => ({
     ...store,
     cron: {
@@ -27,7 +26,6 @@ export const itemPlugin = new Elysia({ name: "item" })
       }),
     },
   }))
-  .get("/item_test", () => "test")
   .group("/api/item", (app) =>
     app
       .get("/status", ({ store }) => ({

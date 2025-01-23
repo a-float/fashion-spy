@@ -9,9 +9,11 @@ type ItemData = {
   meta?: Record<string, unknown>;
 };
 
+export type StoreName = "Vinted" | "Zara" | "Reserved" | "H&M";
+
 export abstract class Extractor {
   abstract appliesTo(url: string): boolean;
-  abstract getStoreName(): string;
+  abstract getStoreName(): StoreName;
 
   abstract getName($: CheerioAPI): string;
   abstract getImgSrc($: CheerioAPI): string;

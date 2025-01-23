@@ -6,12 +6,12 @@ export class VintedExtractor extends Extractor {
     return /^https:\/\/(www\.)?vinted\..*/.test(url);
   }
 
-  getStoreName(): string {
-    return "Vinted";
+  getStoreName() {
+    return "Vinted" as const;
   }
 
   getName($: CheerioAPI): string {
-    return $(`[data-testid="item-page-summary-plugin"] span`).text();
+    return $(`[data-testid="item-page-summary-plugin"] span`).first().text();
   }
 
   getImgSrc($: CheerioAPI): string {
@@ -19,7 +19,11 @@ export class VintedExtractor extends Extractor {
   }
 
   getPriceString($: CheerioAPI): string {
-    return $(`[data-testid="item-price"]`).text();
+    return $(`[data-testid="item-price"]`)
+      .next("button")
+      .children()
+      .first()
+      .text();
   }
 
   override getMeta($: CheerioAPI) {

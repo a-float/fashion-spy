@@ -14,7 +14,6 @@ const AuthModels = {
 };
 
 export const authPlugin = new Elysia()
-  .get("/auth_test", () => "test")
   .state("AuthService", new AuthService())
   .model(AuthModels)
   // every ctx gets user

@@ -1,6 +1,6 @@
 import { db, table } from "db";
 import { and, eq, sql } from "drizzle-orm";
-import { Extractor } from "./extractors/base";
+import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
   NoApplicableExtractorError,
@@ -119,9 +119,10 @@ export class ItemService {
   }
 
   async getAllUserItems(userId: number) {
-    return await db.query.items.findMany({
+    const items = await db.query.items.findMany({
       where: eq(table.items.ownerId, userId),
       with: { status: true },
     });
+    return items as ((typeof items)[number] & { store: StoreName })[];
   }
 }
