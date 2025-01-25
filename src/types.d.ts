@@ -1,9 +1,11 @@
 type User = {
-  email: string;
+  username: string;
+  isAdmin: boolean;
 };
 
 type AppProps = {
   user: User | null;
+  location: string;
 };
 
 interface Window {

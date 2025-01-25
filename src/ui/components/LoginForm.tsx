@@ -1,61 +1,97 @@
-import { Box, TextInput, PasswordInput, Button } from "@mantine/core";
+import {
+  TextInput,
+  PasswordInput,
+  Button,
+  Paper,
+  Stack,
+  Text,
+  SegmentedControl,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useUser } from "ui/hooks/useUser";
+
+type FormValues = {
+  username: string;
+  password: string;
+  action: "login" | "signUp";
+};
 
 const LoginForm = () => {
   const { loginMutation, signUpMutation } = useUser();
 
-  const form = useForm({
+  const form = useForm<FormValues>({
     mode: "controlled",
     initialValues: {
-      email: "",
+      action: "login",
+      username: "",
       password: "",
     },
+    onValuesChange: () => {
+      signUpMutation.reset();
+      loginMutation.reset();
+    },
     validate: {
-      // email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      // password: (value) =>
-      //   value.length > 6 ? null : "Password must be at least 6 characters long",
+      username: (value) => (value.length > 0 ? null : "Username required"),
+      password: (value) => (value.length > 0 ? null : "Password required"),
     },
   });
 
+  const handleSubmit = (values: FormValues) => {
+    if (values.action === "login") loginMutation.mutate(values);
+    else signUpMutation.mutate(values);
+  };
+
+  const error = loginMutation.error || signUpMutation.error;
+  const statusMessage = signUpMutation.isSuccess
+    ? "Account created successfully."
+    : null;
+
   return (
-    <Box style={{ maxWidth: 400, margin: "auto" }}>
-      <TextInput
-        label="Email"
-        placeholder="Enter your email"
-        type="email"
-        required
-        mb="md"
-        {...form.getInputProps("email")}
-      />
-      <PasswordInput
-        label="Password"
-        placeholder="Enter your password"
-        required
-        mb="md"
-        {...form.getInputProps("password")}
-      />
-      <Button
-        fullWidth
-        type="button"
-        mb="sm"
-        onClick={() =>
-          form.onSubmit((values) => loginMutation.mutate(values))()
-        }
-      >
-        Login
-      </Button>
-      <Button
-        fullWidth
-        variant="outline"
-        type="button"
-        onClick={() =>
-          form.onSubmit((values) => signUpMutation.mutate(values))()
-        }
-      >
-        Sign Up
-      </Button>
-    </Box>
+    <Paper maw={400} mx="auto" my="xl" withBorder p="lg" radius="lg">
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Stack gap="lg">
+          <SegmentedControl
+            data={[
+              { label: "Login", value: "login" },
+              { label: "Sign Up", value: "signUp" },
+            ]}
+            {...form.getInputProps("action")}
+          />
+          <TextInput
+            label="Username"
+            placeholder="Enter your username"
+            type="username"
+            aria-required="true"
+            {...form.getInputProps("username")}
+            error={form.errors.username || error?.message}
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Enter your password"
+            aria-required="true"
+            {...form.getInputProps("password")}
+            error={form.errors.password}
+          />
+          {form.values.action === "login" ? (
+            <Button fullWidth type="submit" loading={loginMutation.isPending}>
+              Login
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              fullWidth
+              type="submit"
+              loading={signUpMutation.isPending}
+            >
+              Sign Up
+            </Button>
+          )}
+        </Stack>
+        <Text mt="sm" c={"green.5"}>
+          {statusMessage}
+        </Text>
+      </form>
+    </Paper>
   );
 };
 

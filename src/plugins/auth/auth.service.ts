@@ -1,14 +1,22 @@
 import { db, table } from "db";
-import { eq } from "drizzle-orm";
-import { EmailAlreadyTaken, IncorrectCredentials } from "./auth.errors";
+import { eq, InferSelectModel } from "drizzle-orm";
+import {
+  UsernameAlreadyTaken,
+  IncorrectCredentials,
+  UserInactive,
+} from "./auth.errors";
+
+type _selectUserSchema = InferSelectModel<typeof table.users>;
 
 export class AuthService {
-  async login(body: { email: string; password: string }) {
+  async login(body: { username: string; password: string }) {
     const user = await db.query.users.findFirst({
-      where: eq(table.users.email, body.email),
+      where: eq(table.users.username, body.username),
     });
-    if (!user || !(await Bun.password.verify(body.password, user.password)))
+    if (!user || !(await Bun.password.verify(body.password, user.password))) {
       throw new IncorrectCredentials();
+    }
+    if (!user.isActive) throw new UserInactive();
     const key = crypto.getRandomValues(new Uint32Array(1))[0];
     await db.insert(table.sessions).values({
       id: key,
@@ -17,13 +25,13 @@ export class AuthService {
     return key;
   }
 
-  async signUp(body: { email: string; password: string }) {
+  async signUp(body: { username: string; password: string }) {
     const user = await db.query.users.findFirst({
-      where: eq(table.users.email, body.email),
+      where: eq(table.users.username, body.username),
     });
-    if (user) throw new EmailAlreadyTaken();
+    if (user) throw new UsernameAlreadyTaken();
     await db.insert(table.users).values({
-      email: body.email,
+      username: body.username,
       password: await Bun.password.hash(body.password),
     });
   }
@@ -33,5 +41,14 @@ export class AuthService {
       where: eq(table.sessions.id, parseInt(sessionId)),
       with: { user: true },
     });
+  }
+
+  async updateUser(id: number, data: Partial<_selectUserSchema>) {
+    await db.update(table.users).set(data).where(eq(table.users.id, id));
+  }
+
+  async getAllUsers() {
+    const users = await db.query.users.findMany();
+    return users;
   }
 }

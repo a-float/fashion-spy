@@ -3,7 +3,8 @@ import { and, eq, sql } from "drizzle-orm";
 import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
-  NoApplicableExtractorError,
+  TooManyItems,
+  UserDoesNotExist,
 } from "./item.errors";
 
 function sleep(ms: number): Promise<void> {
@@ -15,7 +16,7 @@ export class ItemService {
 
   private async fetchItemData(url: string) {
     const extractor = this.extractors.find((e) => e.appliesTo(url));
-    if (!extractor) throw new NoApplicableExtractorError();
+    if (!extractor) throw new UserDoesNotExist();
 
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 
@@ -59,7 +60,7 @@ export class ItemService {
                 currency: data.currency,
               })
             : db.update(table.itemStatus).set({
-                updated_at: sql`(current_timestamp)`,
+                updatedAt: sql`(current_timestamp)`,
               });
         })
         .catch((err) => {
@@ -70,7 +71,7 @@ export class ItemService {
             currency: null,
           });
         });
-      // simple rate limiting
+      // rate limiting
       sleep(1000 + Math.random() * 1000);
     }
     console.log(`Update done`);
@@ -85,11 +86,25 @@ export class ItemService {
     if (await file.exists()) await file.delete();
   }
 
-  async addItem(userId: number, url: string) {
-    const item = await db.query.items.findFirst({
-      where: and(eq(table.items.ownerId, userId), eq(table.items.url, url)),
+  private sanitizeUrl(rawUrl: string) {
+    const url = new URL(rawUrl);
+    return `${url.origin}${url.pathname}`;
+  }
+
+  async addItem(userId: number, rawUrl: string) {
+    const user = await db.query.users.findFirst({
+      where: eq(table.users.id, userId),
+      with: { items: true }, // aggregate?
     });
+    if (!user) throw new UserDoesNotExist();
+    const url = this.sanitizeUrl(rawUrl);
+    // const item = await db.query.items.findFirst({
+    //   where: and(eq(table.items.ownerId, userId), eq(table.items.url, url)),
+    // });
+    const item = user.items.find((item) => item.url === url);
     if (item) throw new ItemAlreadyExistsError();
+    if (user.items.length >= user.maxItems) throw new TooManyItems();
+
     const data = await this.fetchItemData(url);
 
     await db.transaction(async (tx) => {

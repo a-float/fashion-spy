@@ -32,7 +32,9 @@ export function useUser() {
     mutationFn: async (
       variables: Parameters<typeof eden.api.signup.post>["0"]
     ) => {
-      await eden.api.signup.post(variables);
+      const res = await eden.api.signup.post(variables);
+      if (res.error) throw res.error;
+      return res.data;
     },
   });
 

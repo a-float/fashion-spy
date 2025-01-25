@@ -4,13 +4,16 @@ import { createInsertSchema } from "drizzle-typebox";
 import { table } from "db";
 
 const _createUserSchema = createInsertSchema(table.users, {
-  email: (schema) => t.String({ ...schema, minLength: 3 }),
-  password: (schema) => t.String({ ...schema, minLength: 3 }),
+  username: (schema) => t.String({ ...schema, minLength: 1 }),
+  password: (schema) => t.String({ ...schema, minLength: 1 }),
 });
 
 const AuthModels = {
-  signUp: t.Pick(_createUserSchema, ["email", "password"]),
-  signIn: t.Pick(_createUserSchema, ["email", "password"]),
+  signUp: t.Pick(_createUserSchema, ["username", "password"]),
+  signIn: t.Pick(_createUserSchema, ["username", "password"]),
+  updateUser: t.Optional(
+    t.Pick(_createUserSchema, ["isActive", "maxItems", "isAdmin"])
+  ),
 };
 
 export const authPlugin = new Elysia()
@@ -28,6 +31,12 @@ export const authPlugin = new Elysia()
     isLoggedIn: (_enabled: true) => ({
       resolve: ({ user, set }) => {
         if (user) return { user };
+        throw (set.status = "Unauthorized");
+      },
+    }),
+    isAdmin: (_enabled: true) => ({
+      resolve: ({ user, set }) => {
+        if (user && user.isAdmin === 1) return { user };
         throw (set.status = "Unauthorized");
       },
     }),
@@ -58,6 +67,21 @@ export const authPlugin = new Elysia()
         return { ok: true };
       })
       .get("/profile", ({ user }) => {
-        return user ? { email: user.email } : null;
+        return user ? { username: user.username } : null;
       })
+      .get("/users", ({ store }) => store.AuthService.getAllUsers(), {
+        isAdmin: true,
+      })
+      .put(
+        "/user/:id",
+        async ({ params: { id }, body, store }) => {
+          await store.AuthService.updateUser(id, body);
+          return { ok: true };
+        },
+        {
+          isAdmin: true,
+          params: t.Object({ id: t.Number() }),
+          body: "updateUser",
+        }
+      )
   );

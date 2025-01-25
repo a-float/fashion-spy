@@ -38,7 +38,7 @@ const ItemSearchBar = () => {
 
   return (
     <Form form={form} onSubmit={(values) => addItemMutation.mutate(values)}>
-      <Group align="flex-end">
+      <Group align="flex-start">
         <TextInput
           flex={1}
           label="Item url"
@@ -50,10 +50,11 @@ const ItemSearchBar = () => {
         />
         <Button
           type="submit"
-          disabled={form.values.url.length > 0}
           loading={addItemMutation.isPending}
           variant="gradient"
           gradient={{ from: "blue", to: "grape", deg: 145 }}
+          pos="relative"
+          top={25}
         >
           Add
         </Button>

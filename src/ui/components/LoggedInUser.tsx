@@ -1,5 +1,5 @@
 import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
-import { IconChevronDown, IconLogout } from "@tabler/icons-react";
+import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
 import { useUser } from "ui/hooks/useUser";
 
 const LoggedInUser = () => {
@@ -14,7 +14,7 @@ const LoggedInUser = () => {
           <Group gap="xs">
             <div>
               <Text size="md" c="dimmed">
-                {user.email.split("@")[0]}
+                {user.username}
               </Text>
             </div>
             <IconChevronDown size={16} />
@@ -23,6 +23,13 @@ const LoggedInUser = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
+        <Menu.Item
+          component="a"
+          href="/admin"
+          leftSection={<IconLock size={16} />}
+        >
+          Admin panel
+        </Menu.Item>
         <Menu.Item
           leftSection={<IconLogout size={16} />}
           color="red"

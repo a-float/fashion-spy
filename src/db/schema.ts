@@ -8,9 +8,12 @@ const currentTime = () =>
 
 export const users = sqliteTable("users", {
   id: int().primaryKey({ autoIncrement: true }),
-  email: text().notNull().unique(),
+  username: text().notNull().unique(),
   password: text().notNull(),
-  created_at: currentTime(),
+  createdAt: currentTime(),
+  isActive: int().notNull().default(0),
+  isAdmin: int().notNull().default(0),
+  maxItems: int().notNull().default(20),
 });
 
 export const userRelations = relations(users, ({ one, many }) => ({
@@ -23,6 +26,7 @@ export const userRelations = relations(users, ({ one, many }) => ({
 
 export const sessions = sqliteTable("sessions", {
   id: int().primaryKey(),
+  createdAt: currentTime(),
   userId: int()
     .notNull()
     .references(() => users.id),
@@ -45,7 +49,7 @@ export const items = sqliteTable("items", {
     .notNull()
     .references(() => users.id),
   hidden: int().notNull().default(0),
-  created_at: currentTime(),
+  createdAt: currentTime(),
 });
 
 export const itemsRelations = relations(items, ({ one, many }) => ({
@@ -63,8 +67,8 @@ export const itemStatus = sqliteTable("item_status", {
     .references(() => items.id, { onDelete: "cascade" }),
   amount: int(),
   currency: text(),
-  created_at: currentTime(),
-  updated_at: currentTime(),
+  createdAt: currentTime(),
+  updatedAt: currentTime(),
 });
 
 export const itemStatusRelations = relations(itemStatus, ({ one }) => ({
