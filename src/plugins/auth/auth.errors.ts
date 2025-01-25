@@ -1,16 +1,18 @@
-export class UsernameAlreadyTaken extends Error {
+export abstract class AuthServiceError extends Error {}
+
+export class UsernameAlreadyTaken extends AuthServiceError {
   constructor() {
     super("Username already taken.");
   }
 }
 
-export class IncorrectCredentials extends Error {
+export class IncorrectCredentials extends AuthServiceError {
   constructor() {
     super("Incorrect username or password.");
   }
 }
 
-export class UserInactive extends Error {
+export class UserInactive extends AuthServiceError {
   constructor() {
     super("Account not activated. Ask Mati to activate it.");
   }

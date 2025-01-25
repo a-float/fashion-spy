@@ -7,6 +7,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
 
@@ -19,7 +20,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
     initialValues: {
       isAdmin: user.isAdmin === 1,
       isActive: user.isActive === 1,
-      maxItems: user.maxItems,
+      maxTrackedItems: user.maxTrackedItems,
     },
   });
 
@@ -33,6 +34,11 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
     },
     onSuccess: () => {
       form.setInitialValues(form.values);
+      form.reset();
+      notifications.show({
+        title: "Success",
+        message: "User data has been updated successfully",
+      });
     },
   });
 
@@ -53,7 +59,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
       </Table.Td>
       <Table.Td>
         <NumberInput
-          {...form.getInputProps("maxItems")}
+          {...form.getInputProps("maxTrackedItems")}
           min={1}
           max={100}
           step={1}

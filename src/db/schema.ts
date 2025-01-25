@@ -13,7 +13,7 @@ export const users = sqliteTable("users", {
   createdAt: currentTime(),
   isActive: int().notNull().default(0),
   isAdmin: int().notNull().default(0),
-  maxItems: int().notNull().default(20),
+  maxTrackedItems: int().notNull().default(20),
 });
 
 export const userRelations = relations(users, ({ one, many }) => ({
@@ -48,7 +48,7 @@ export const items = sqliteTable("items", {
   ownerId: int()
     .notNull()
     .references(() => users.id),
-  hidden: int().notNull().default(0),
+  isTracked: int().notNull().default(1),
   createdAt: currentTime(),
 });
 

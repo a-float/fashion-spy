@@ -12,7 +12,7 @@ const AuthModels = {
   signUp: t.Pick(_createUserSchema, ["username", "password"]),
   signIn: t.Pick(_createUserSchema, ["username", "password"]),
   updateUser: t.Optional(
-    t.Pick(_createUserSchema, ["isActive", "maxItems", "isAdmin"])
+    t.Pick(_createUserSchema, ["isActive", "maxTrackedItems", "isAdmin"])
   ),
 };
 
@@ -67,7 +67,13 @@ export const authPlugin = new Elysia()
         return { ok: true };
       })
       .get("/profile", ({ user }) => {
-        return user ? { username: user.username } : null;
+        return user
+          ? {
+              username: user.username,
+              isAdmin: user.isAdmin,
+              maxTrackedItems: user.maxTrackedItems,
+            }
+          : null;
       })
       .get("/users", ({ store }) => store.AuthService.getAllUsers(), {
         isAdmin: true,
@@ -75,6 +81,7 @@ export const authPlugin = new Elysia()
       .put(
         "/user/:id",
         async ({ params: { id }, body, store }) => {
+          console.log({ id, body });
           await store.AuthService.updateUser(id, body);
           return { ok: true };
         },

@@ -19,7 +19,11 @@ const renderUI = async (
   const ssrProps = {
     location,
     user: user
-      ? { username: user.username, isAdmin: user.isAdmin === 1 }
+      ? {
+          username: user.username,
+          isAdmin: user.isAdmin === 1,
+          maxTrackedItems: user.maxTrackedItems,
+        }
       : null,
   };
   const app = <App {...ssrProps} />;

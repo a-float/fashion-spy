@@ -1,8 +1,9 @@
 import { db, table } from "db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, InferSelectModel, SQL, sql } from "drizzle-orm";
 import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
+  ItemNotFound,
   TooManyItems,
   UserDoesNotExist,
 } from "./item.errors";
@@ -10,6 +11,8 @@ import {
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+type Item = InferSelectModel<typeof table.items>;
 
 export class ItemService {
   constructor(private extractors: Extractor[]) {}
@@ -46,9 +49,9 @@ export class ItemService {
 
   async updateAllItemStatus() {
     // TODO use a logger with time
-    const items = await this.getAllItems();
+    const items = await this.getAllVisibleItems();
     console.log(`Starting update of ${items.length} items at ...`);
-    for (const item of items.filter((item) => !item.hidden)) {
+    for (const item of items) {
       await this.fetchItemData(item.url)
         .then((data) => {
           const lastStatus = item.status.at(-1)!;
@@ -94,7 +97,7 @@ export class ItemService {
   async addItem(userId: number, rawUrl: string) {
     const user = await db.query.users.findFirst({
       where: eq(table.users.id, userId),
-      with: { items: true }, // aggregate?
+      with: { items: { where: eq(table.items.isTracked, 1) } }, // aggregate?
     });
     if (!user) throw new UserDoesNotExist();
     const url = this.sanitizeUrl(rawUrl);
@@ -103,7 +106,7 @@ export class ItemService {
     // });
     const item = user.items.find((item) => item.url === url);
     if (item) throw new ItemAlreadyExistsError();
-    if (user.items.length >= user.maxItems) throw new TooManyItems();
+    if (user.items.length >= user.maxTrackedItems) throw new TooManyItems();
 
     const data = await this.fetchItemData(url);
 
@@ -129,8 +132,15 @@ export class ItemService {
     });
   }
 
-  private async getAllItems() {
-    return await db.query.items.findMany({ with: { status: true } });
+  private async getAllVisibleItems(userId?: number) {
+    return await db.query.items.findMany({
+      where: (item, { eq, and }) => {
+        const args: SQL[] = [eq(item.isTracked, 1)];
+        if (userId) args.push(eq(item.ownerId, userId));
+        return and(...args);
+      },
+      with: { status: true },
+    });
   }
 
   async getAllUserItems(userId: number) {
@@ -139,5 +149,31 @@ export class ItemService {
       with: { status: true },
     });
     return items as ((typeof items)[number] & { store: StoreName })[];
+  }
+
+  async getItem(itemId: number) {
+    return await db.query.items.findFirst({
+      where: eq(table.items.id, itemId),
+      with: { user: { columns: { maxTrackedItems: true } } },
+    });
+  }
+
+  async updateItem(userId: number, itemId: number, data: Partial<Item>) {
+    const item = await this.getItem(itemId);
+    if (!item || item.ownerId !== userId) throw new ItemNotFound();
+    const visibleUserItems = (await this.getAllVisibleItems(item.ownerId))
+      .length;
+    console.log({ visibleUserItems, item, data });
+    if (
+      !item.isTracked &&
+      data.isTracked &&
+      item.user.maxTrackedItems <= visibleUserItems
+    ) {
+      throw new TooManyItems();
+    }
+    return await db
+      .update(table.items)
+      .set(data)
+      .where(eq(table.items.id, itemId));
   }
 }

@@ -1,23 +1,31 @@
-export class ItemAlreadyExistsError extends Error {
+export abstract class ItemServiceError extends Error {}
+
+export class ItemAlreadyExistsError extends ItemServiceError {
   constructor() {
     super("Item with the given url already exists.");
   }
 }
 
-export class TooManyItems extends Error {
+export class TooManyItems extends ItemServiceError {
   constructor() {
     super("User item limit has been reached.");
   }
 }
 
-export class NoApplicableExtractorError extends Error {
+export class NoApplicableExtractorError extends ItemServiceError {
   constructor() {
     super("Url is not supported.");
   }
 }
 
-export class UserDoesNotExist extends Error {
+export class UserDoesNotExist extends ItemServiceError {
   constructor() {
     super("User does not exist.");
+  }
+}
+
+export class ItemNotFound extends ItemServiceError {
+  constructor() {
+    super("Item not found.");
   }
 }

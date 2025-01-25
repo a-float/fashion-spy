@@ -1,6 +1,5 @@
 type User = {
   username: string;
-  isAdmin: boolean;
 };
 
 type AppProps = {

@@ -5,8 +5,9 @@ import {
   IncorrectCredentials,
   UserInactive,
 } from "./auth.errors";
+import { createSelectSchema } from "drizzle-typebox";
 
-type _selectUserSchema = InferSelectModel<typeof table.users>;
+const UserSchema = createSelectSchema(table.users);
 
 export class AuthService {
   async login(body: { username: string; password: string }) {
@@ -43,12 +44,13 @@ export class AuthService {
     });
   }
 
-  async updateUser(id: number, data: Partial<_selectUserSchema>) {
+  async updateUser(id: number, data: Partial<typeof UserSchema.static>) {
     await db.update(table.users).set(data).where(eq(table.users.id, id));
   }
 
   async getAllUsers() {
-    const users = await db.query.users.findMany();
-    return users;
+    return await db.query.users.findMany({
+      columns: { ...UserSchema, password: false },
+    });
   }
 }
