@@ -62,9 +62,12 @@ export class ItemService {
                 amount: data.amount,
                 currency: data.currency,
               })
-            : db.update(table.itemStatus).set({
-                updatedAt: sql`(current_timestamp)`,
-              });
+            : db
+                .update(table.itemStatus)
+                .set({
+                  updatedAt: sql`(current_timestamp)`,
+                })
+                .where(eq(table.itemStatus, lastStatus.id));
         })
         .catch((err) => {
           console.log(`Failed to update item[id=${item.id}], ${err}`);

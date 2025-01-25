@@ -33,7 +33,7 @@ export const itemPlugin = new Elysia({ name: "item" })
       }),
     },
   }))
-  .group("/api/item", (app) =>
+  .group("/api/items", (app) =>
     app
       .get("/status", ({ store }) => ({
         msToNext: store.cron.updateStatus.msToNext(),

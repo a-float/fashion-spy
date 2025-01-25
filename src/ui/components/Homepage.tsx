@@ -29,7 +29,7 @@ const Homepage = () => {
   const itemsQuery = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const res = await eden.api.item.index.get();
+      const res = await eden.api.items.index.get();
       if (res.error) throw res.error;
       return res.data;
     },
@@ -38,7 +38,7 @@ const Homepage = () => {
 
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      const res = await eden.api.item({ itemId }).delete();
+      const res = await eden.api.items({ itemId }).delete();
       if (res.error) throw res.error;
       return res.data;
     },

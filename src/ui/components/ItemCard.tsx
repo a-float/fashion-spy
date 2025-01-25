@@ -24,7 +24,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 
 export type ItemCardProps = NonNullable<
-  Awaited<ReturnType<typeof eden.api.item.index.get>>["data"]
+  Awaited<ReturnType<typeof eden.api.items.index.get>>["data"]
 >[number] & {
   handleDelete: (itemId: number) => Promise<unknown>;
 };
@@ -50,7 +50,7 @@ const ItemCard = (props: ItemCardProps) => {
   const updateHiddenMutation = useMutation({
     mutationFn: async (body: { isTracked: 0 | 1 }) => {
       console.log("updating");
-      const res = await eden.api.item({ itemId: props.id }).put(body);
+      const res = await eden.api.items({ itemId: props.id }).put(body);
       if (res.error) throw res.error;
       return res.data;
     },

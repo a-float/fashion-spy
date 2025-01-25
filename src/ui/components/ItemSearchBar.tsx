@@ -26,7 +26,7 @@ const ItemSearchBar = () => {
 
   const addItemMutation = useMutation({
     mutationFn: async (variables: typeof form.values) => {
-      const res = await eden.api.item.index.post({ url: variables.url });
+      const res = await eden.api.items.index.post({ url: variables.url });
       if (res.error) throw res.error;
       return res.data;
     },

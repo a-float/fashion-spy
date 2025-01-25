@@ -62,8 +62,11 @@ export const authPlugin = new Elysia()
         },
         { body: "signIn" }
       )
-      .get("/logout", async ({ cookie: { token } }) => {
-        if (token) token.remove();
+      .get("/logout", async ({ store, cookie: { token } }) => {
+        if (token && token.value) {
+          await store.AuthService.endSession(parseInt(token.value));
+          token.remove();
+        }
         return { ok: true };
       })
       .get("/profile", ({ user }) => {
@@ -79,7 +82,7 @@ export const authPlugin = new Elysia()
         isAdmin: true,
       })
       .put(
-        "/user/:id",
+        "/users/:id",
         async ({ params: { id }, body, store }) => {
           console.log({ id, body });
           await store.AuthService.updateUser(id, body);

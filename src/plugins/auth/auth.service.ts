@@ -1,5 +1,5 @@
 import { db, table } from "db";
-import { eq, InferSelectModel } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import {
   UsernameAlreadyTaken,
   IncorrectCredentials,
@@ -39,7 +39,10 @@ export class AuthService {
 
   async getSession(sessionId: string) {
     return await db.query.sessions.findFirst({
-      where: eq(table.sessions.id, parseInt(sessionId)),
+      where: and(
+        eq(table.sessions.id, parseInt(sessionId)),
+        isNull(table.sessions.closedAt)
+      ),
       with: { user: true },
     });
   }
@@ -52,5 +55,16 @@ export class AuthService {
     return await db.query.users.findMany({
       columns: { ...UserSchema, password: false },
     });
+  }
+
+  async endSession(sessionId: number) {
+    try {
+      await db
+        .update(table.sessions)
+        .set({ closedAt: sql`(current_timestamp)` })
+        .where(eq(table.sessions.id, sessionId));
+    } catch (e) {
+      console.log("Error while closing session", String(e));
+    }
   }
 }
