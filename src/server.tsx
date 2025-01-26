@@ -4,7 +4,9 @@ import App from "./ui/App";
 import { staticPlugin } from "@elysiajs/static";
 import { itemPlugin } from "plugins/item";
 import { type InferSelectModel } from "drizzle-orm";
+import path from "path";
 import { table } from "db";
+import fs from "node:fs/promises";
 
 await Bun.build({
   entrypoints: ["./src/ui/bootstrap.tsx"],
@@ -12,19 +14,23 @@ await Bun.build({
   minify: true,
 });
 
+const getCSSLinks = async () => {
+  // TODO cache
+  const publicPath = path.resolve("public");
+  const cssFiles = (await fs.readdir(publicPath)).filter((file) =>
+    file.endsWith(".css")
+  );
+  return cssFiles.map((file) => `/public/${file}`);
+};
+
 const renderUI = async (
   user: InferSelectModel<typeof table.users> | null,
   location: string
 ) => {
-  const ssrProps = {
+  const ssrProps: AppProps = {
     location,
-    user: user
-      ? {
-          username: user.username,
-          isAdmin: user.isAdmin === 1,
-          maxTrackedItems: user.maxTrackedItems,
-        }
-      : null,
+    styleLinks: await getCSSLinks(),
+    user: user ? { username: user.username } : null,
   };
   const app = <App {...ssrProps} />;
   const stream = await renderToReadableStream(app, {

@@ -25,7 +25,7 @@ const App = (props: AppProps) => {
   });
 
   return (
-    <Html>
+    <Html styleLinks={props.styleLinks}>
       <MantineProvider theme={theme} defaultColorScheme="dark">
         <Notifications />
         <QueryClientProvider client={new QueryClient()}>

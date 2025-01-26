@@ -1,9 +1,10 @@
 import React from "react";
+import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
 type HtmlProps = {
   children?: React.ReactNode;
-  styles?: React.ReactNode;
+  styleLinks?: string[];
 };
 
 const Html = (props: HtmlProps) => {
@@ -13,10 +14,10 @@ const Html = (props: HtmlProps) => {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Fashion Spy</title>
-        <link rel="stylesheet" href="/public/styles.css"></link>
-        <link rel="stylesheet" href="/public/notifications.css"></link>
         {/* <ColorSchemeScript /> */}
-        {props.styles}
+        {props.styleLinks?.map((href) => (
+          <link key={href} rel="stylesheet" href={href} />
+        ))}
       </head>
       <body>{props.children}</body>
     </html>

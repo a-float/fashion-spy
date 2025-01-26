@@ -1,7 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 public/bootstrap.js
+cache
+public/img
+public/*.css
 *.db
+.env
 
 # dependencies
 /node_modules
