@@ -22,7 +22,7 @@ export class HmExtractor extends Extractor {
     return $(`h1`).parent().next().next().text();
   }
 
-  getMeta($: CheerioAPI) {
-    return undefined;
+  getDetails($: CheerioAPI) {
+    return {};
   }
 }

@@ -18,6 +18,8 @@ import {
   IconOutbound,
   IconEye,
   IconHanger,
+  IconRefresh,
+  IconHeart,
 } from "@tabler/icons-react";
 import { eden } from "ui/eden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -36,6 +38,8 @@ export type ItemCardProps = NonNullable<
 //   "H&M": "red.7",
 // };
 
+const PURPLE = "#6c66c3";
+
 const ItemCard = (props: ItemCardProps) => {
   const queryClient = useQueryClient();
   const [loading, setLoading] = React.useState(false);
@@ -49,7 +53,6 @@ const ItemCard = (props: ItemCardProps) => {
 
   const updateHiddenMutation = useMutation({
     mutationFn: async (body: { isTracked: 0 | 1 }) => {
-      console.log("updating");
       const res = await eden.api.items({ itemId: props.id }).put(body);
       if (res.error) throw res.error;
       return res.data;
@@ -61,6 +64,26 @@ const ItemCard = (props: ItemCardProps) => {
       notifications.show({
         color: "red.5",
         title: "Item update failed",
+        message: e.message,
+      }),
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async () => {
+      const res = await eden.api
+        .items({ itemId: props.id })
+        .updateStatus.post();
+      if (res.error) throw res.error;
+      return res.data;
+    },
+
+    // TODO unify delete and update?
+    // TODO group queryKeys?
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
+    onError: (e) =>
+      notifications.show({
+        color: "red.5",
+        title: "Item status update failed",
         message: e.message,
       }),
   });
@@ -82,7 +105,7 @@ const ItemCard = (props: ItemCardProps) => {
         <ActionIcon
           style={{ zIndex: 75 }}
           variant="filled"
-          color="#6c66c3"
+          color={PURPLE}
           aria-label="Settings"
           pos={"absolute"}
           right={6}
@@ -98,6 +121,14 @@ const ItemCard = (props: ItemCardProps) => {
         <Menu.Item leftSection={<IconEye size={14} />} onClick={toggleHidden}>
           {props.isTracked ? "Pause tracking" : "Resume tracking"}
         </Menu.Item>
+        {!!props.isTracked && (
+          <Menu.Item
+            leftSection={<IconRefresh size={14} />}
+            onClick={() => updateStatusMutation.mutate()}
+          >
+            Update item status
+          </Menu.Item>
+        )}
         <Menu.Item
           leftSection={<IconOutbound size={14} />}
           component="a"
@@ -106,9 +137,6 @@ const ItemCard = (props: ItemCardProps) => {
         >
           Go to store
         </Menu.Item>
-        {/* <Menu.Item leftSection={<IconChartHistogram size={14} />}>
-          View history
-        </Menu.Item> */}
         <Menu.Divider />
         <Menu.Label>Danger zone</Menu.Label>
         <Menu.Item
@@ -132,8 +160,9 @@ const ItemCard = (props: ItemCardProps) => {
       style={{ overflow: "hidden" }}
     >
       <LoadingOverlay
-        visible={loading}
+        visible={loading || updateStatusMutation.isPending}
         zIndex={1000}
+        loaderProps={{ color: PURPLE }}
         overlayProps={{ blur: 2 }}
       />
       {!props.isTracked ? (
@@ -144,8 +173,23 @@ const ItemCard = (props: ItemCardProps) => {
         </Overlay>
       ) : null}
       <Flex direction={"column"}>
-        <Box h={{ base: 240, xs: 350 }}>
+        <Box h={{ base: 240, xs: 350 }} pos="relative">
           <Image src={props.imagePath} h="100%" alt="" />
+          {Object.hasOwn(lastStatus.details, "likes") && (
+            <Paper
+              pos="absolute"
+              bottom={6}
+              right={6}
+              radius={"md"}
+              display={"flex"}
+              p={4}
+              px={6}
+              style={{ justifyContent: "center", alignItems: "center" }}
+            >
+              <IconHeart style={{ width: 16 }} />
+              <Box ml={4}>{lastStatus.details.likes}</Box>
+            </Paper>
+          )}
         </Box>
         <Stack gap="0" h="100%" p="md">
           <Flex
@@ -171,7 +215,7 @@ const ItemCard = (props: ItemCardProps) => {
 
           <Text size="sm" mb="sm">
             Last checked on:
-            <br /> {lastStatus.createdAt}
+            <br /> {lastStatus.updatedAt}
           </Text>
 
           <Text size="sm" c="dimmed" lineClamp={1}>

@@ -26,7 +26,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
 
   const updateUserMutation = useMutation({
     mutationFn: async (values: typeof form.values) => {
-      await eden.api.user({ id: user.id }).put({
+      await eden.api.users({ id: user.id }).put({
         ...values,
         isAdmin: Number(values.isAdmin),
         isActive: Number(values.isActive),

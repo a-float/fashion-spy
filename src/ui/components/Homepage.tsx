@@ -76,7 +76,7 @@ const Homepage = () => {
           <ItemSearchBar />
           <Group my="md">
             {filterChips}{" "}
-            {!!trackedItemsCount && (
+            {trackedItemsCount !== undefined && (
               <Group ml="auto" gap="xs">
                 <Text>
                   {`Tracked items: ${trackedItemsCount} / ${user.maxTrackedItems}`}

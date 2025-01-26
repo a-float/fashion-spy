@@ -25,7 +25,7 @@ export class ZaraExtractor extends Extractor {
     return x;
   }
 
-  getMeta($: CheerioAPI) {
-    return undefined;
+  getDetails($: CheerioAPI) {
+    return {};
   }
 }

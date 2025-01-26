@@ -1,5 +1,13 @@
 import { db, table } from "db";
-import { and, eq, InferSelectModel, SQL, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  InferInsertModel,
+  InferSelectModel,
+  SQL,
+  sql,
+} from "drizzle-orm";
 import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
@@ -13,6 +21,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 type Item = InferSelectModel<typeof table.items>;
+type ItemStatus = InferInsertModel<typeof table.itemStatus>;
 
 export class ItemService {
   constructor(private extractors: Extractor[]) {}
@@ -24,7 +33,7 @@ export class ItemService {
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 
     const onDev = process.env.BUN_ENV === "dev";
-    if (!onDev && (await cachedHtml.exists())) {
+    if (onDev && (await cachedHtml.exists())) {
       console.log(`Using cached response for ${url}`);
       return await extractor.extractData(await cachedHtml.text());
     } else {
@@ -47,36 +56,53 @@ export class ItemService {
     }
   }
 
+  private hashStatus(status: ItemStatus): string {
+    const { createdAt, updatedAt, id, ...rest } = status;
+    return JSON.stringify(rest);
+  }
+
+  async updateItemStatus(
+    item: Awaited<ReturnType<typeof this.getVisibleItems>>[number]
+  ) {
+    const data = await this.fetchItemData(item.url).catch((e) => {
+      console.log(`Failed to update item[id=${item.id}], ${e}`);
+      return {
+        amount: null,
+        currency: null,
+        details: {},
+      };
+    });
+    const lastStatus = item.status.at(-1);
+    const newStatus: ItemStatus = {
+      itemId: item.id,
+      amount: data.amount,
+      currency: data.currency,
+      details: data.details,
+    };
+
+    console.log({ newStatus });
+    const shouldInsert =
+      !lastStatus || this.hashStatus(lastStatus) !== this.hashStatus(newStatus);
+
+    if (shouldInsert) {
+      await db.insert(table.itemStatus).values(newStatus);
+    } else {
+      console.log("updating status with id", lastStatus.id);
+      await db
+        .update(table.itemStatus)
+        .set({
+          updatedAt: sql`(current_timestamp)`,
+        })
+        .where(eq(table.itemStatus.id, lastStatus.id));
+    }
+  }
+
   async updateAllItemStatus() {
     // TODO use a logger with time
-    const items = await this.getAllVisibleItems();
+    const items = await this.getVisibleItems();
     console.log(`Starting update of ${items.length} items at ...`);
     for (const item of items) {
-      await this.fetchItemData(item.url)
-        .then((data) => {
-          const lastStatus = item.status.at(-1)!;
-          // do not add new item if nothing has changed
-          return lastStatus.amount !== data.amount
-            ? db.insert(table.itemStatus).values({
-                itemId: item.id,
-                amount: data.amount,
-                currency: data.currency,
-              })
-            : db
-                .update(table.itemStatus)
-                .set({
-                  updatedAt: sql`(current_timestamp)`,
-                })
-                .where(eq(table.itemStatus, lastStatus.id));
-        })
-        .catch((err) => {
-          console.log(`Failed to update item[id=${item.id}], ${err}`);
-          db.insert(table.itemStatus).values({
-            itemId: item.id,
-            amount: null,
-            currency: null,
-          });
-        });
+      await this.updateItemStatus(item);
       // rate limiting
       sleep(1000 + Math.random() * 1000);
     }
@@ -129,27 +155,33 @@ export class ItemService {
         itemId: item.id,
         amount: data.amount,
         currency: data.currency,
+        details: data.details,
       });
 
       return item;
     });
   }
 
-  private async getAllVisibleItems(userId?: number) {
+  async getVisibleItems(opts: { userId?: number; itemId?: number } = {}) {
     return await db.query.items.findMany({
       where: (item, { eq, and }) => {
         const args: SQL[] = [eq(item.isTracked, 1)];
-        if (userId) args.push(eq(item.ownerId, userId));
+        if (opts.userId) args.push(eq(item.ownerId, opts.userId));
+        if (opts.itemId) args.push(eq(item.id, opts.itemId));
         return and(...args);
       },
-      with: { status: true },
+      with: {
+        status: { orderBy: [desc(table.itemStatus.updatedAt)], limit: 1 },
+      },
     });
   }
 
   async getAllUserItems(userId: number) {
     const items = await db.query.items.findMany({
       where: eq(table.items.ownerId, userId),
-      with: { status: true },
+      with: {
+        status: { orderBy: [desc(table.itemStatus.updatedAt)], limit: 1 },
+      },
     });
     return items as ((typeof items)[number] & { store: StoreName })[];
   }
@@ -164,8 +196,9 @@ export class ItemService {
   async updateItem(userId: number, itemId: number, data: Partial<Item>) {
     const item = await this.getItem(itemId);
     if (!item || item.ownerId !== userId) throw new ItemNotFound();
-    const visibleUserItems = (await this.getAllVisibleItems(item.ownerId))
-      .length;
+    const visibleUserItems = (
+      await this.getVisibleItems({ userId: item.ownerId })
+    ).length;
     console.log({ visibleUserItems, item, data });
     if (
       !item.isTracked &&

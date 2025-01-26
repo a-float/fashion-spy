@@ -56,7 +56,7 @@ export const itemPlugin = new Elysia({ name: "item" })
       )
       .put(
         "/:itemId",
-        async ({ store, user, params, set, body }) => {
+        async ({ store, user, params, body }) => {
           return await store.ItemService.updateItem(
             user.id,
             params.itemId,
@@ -66,6 +66,26 @@ export const itemPlugin = new Elysia({ name: "item" })
         {
           params: t.Object({ itemId: t.Number() }),
           body: "updateItem",
+          isLoggedIn: true,
+        }
+      )
+      .post(
+        "/:itemId/updateStatus",
+        async ({ store, user, params, set, body }) => {
+          const items = await store.ItemService.getVisibleItems({
+            userId: user.id,
+            itemId: params.itemId,
+          });
+          const item = items[0];
+          if (!item) {
+            set.status = "Bad Request";
+            return;
+          }
+          await store.ItemService.updateItemStatus(item);
+          return { ok: true };
+        },
+        {
+          params: t.Object({ itemId: t.Number() }),
           isLoggedIn: true,
         }
       )

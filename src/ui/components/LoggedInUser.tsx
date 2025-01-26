@@ -23,13 +23,15 @@ const LoggedInUser = () => {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item
-          component="a"
-          href="/admin"
-          leftSection={<IconLock size={16} />}
-        >
-          Admin panel
-        </Menu.Item>
+        {!!user.isAdmin && (
+          <Menu.Item
+            component="a"
+            href="/admin"
+            leftSection={<IconLock size={16} />}
+          >
+            Admin panel
+          </Menu.Item>
+        )}
         <Menu.Item
           leftSection={<IconLogout size={16} />}
           color="red"

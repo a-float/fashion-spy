@@ -70,6 +70,9 @@ export const itemStatus = sqliteTable("item_status", {
   currency: text(),
   createdAt: currentTime(),
   updatedAt: currentTime(),
+  details: text({ mode: "json" })
+    .$type<Record<string, string | number>>()
+    .notNull(),
 });
 
 export const itemStatusRelations = relations(itemStatus, ({ one }) => ({

@@ -6,7 +6,7 @@ type ItemData = {
   amount: number;
   currency: string;
   image: string;
-  meta?: Record<string, unknown>;
+  details: Record<string, string | number>;
 };
 
 export type StoreName = "Vinted" | "Zara" | "Reserved" | "H&M";
@@ -18,7 +18,7 @@ export abstract class Extractor {
   abstract getName($: CheerioAPI): string;
   abstract getImgSrc($: CheerioAPI): string;
   abstract getPriceString($: CheerioAPI): string;
-  abstract getMeta($: CheerioAPI): ItemData["meta"];
+  abstract getDetails($: CheerioAPI): ItemData["details"];
 
   async extractData(html: string): Promise<ItemData> {
     const $ = load(html);
@@ -39,6 +39,7 @@ export abstract class Extractor {
       const imgRes = await fetch(imgSrc);
       await Bun.write(imgFile, await imgRes.blob());
     } else {
+      // TODO resize img
       console.log("Using cached img");
     }
 
@@ -48,7 +49,7 @@ export abstract class Extractor {
       amount,
       currency,
       image: imgFile.name!,
-      meta: this.getMeta($),
+      details: this.getDetails($),
     };
   }
 }

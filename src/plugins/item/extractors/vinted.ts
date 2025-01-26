@@ -26,7 +26,7 @@ export class VintedExtractor extends Extractor {
       .text();
   }
 
-  override getMeta($: CheerioAPI) {
+  override getDetails($: CheerioAPI) {
     return { likes: parseInt($(`[data-testid="favourite-button"]`).text()) };
   }
 }

@@ -28,7 +28,7 @@ export class ReservedExtractor extends Extractor {
     return data.offers.price + " " + data.offers.priceCurrency;
   }
 
-  override getMeta($: CheerioAPI) {
-    return undefined;
+  override getDetails($: CheerioAPI) {
+    return {};
   }
 }
