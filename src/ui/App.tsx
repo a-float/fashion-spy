@@ -1,16 +1,28 @@
-import Html from "./components/Html";
 import {
   AppShell,
   createTheme,
   MantineProvider,
+  useProps,
   virtualColor,
 } from "@mantine/core";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Homepage from "./components/Homepage";
+import Html from "./components/Html";
+import {
+  DehydratedState,
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import Navbar from "./components/Navbar";
-import { Route, Routes, StaticRouter } from "react-router";
-import AdminPage from "./components/AdminPage";
 import { Notifications } from "@mantine/notifications";
+import { StrictMode } from "react";
+import { RouterProvider } from "ui/router/router";
+import { createAppRouter } from "./router/appRouter";
+
+export type AppProps = {
+  styleLinks: string[];
+  dehydratedState: DehydratedState;
+  location?: string;
+};
 
 const App = (props: AppProps) => {
   console.log("App props", { props });
@@ -24,23 +36,31 @@ const App = (props: AppProps) => {
     },
   });
 
+  const queryClient = new QueryClient();
+  const router = createAppRouter();
+  if (props.location) router.ssrLocation = props.location;
+
   return (
-    <Html styleLinks={props.styleLinks}>
-      <MantineProvider theme={theme} defaultColorScheme="dark">
-        <Notifications />
-        <QueryClientProvider client={new QueryClient()}>
-          <AppShell header={{ height: 60 }} maw={1440} mx="auto" padding="md">
-            <Navbar />
-            <StaticRouter location={props.location}>
-              <Routes>
-                <Route path="/" element={<Homepage />} />
-                <Route path="/admin" element={<AdminPage />} />
-              </Routes>
-            </StaticRouter>
-          </AppShell>
-        </QueryClientProvider>
-      </MantineProvider>
-    </Html>
+    <StrictMode>
+      <Html styleLinks={props.styleLinks}>
+        <MantineProvider theme={theme} defaultColorScheme="dark">
+          <Notifications />
+          <QueryClientProvider client={queryClient}>
+            <HydrationBoundary state={props.dehydratedState}>
+              <AppShell
+                header={{ height: 60 }}
+                maw={1440}
+                mx="auto"
+                padding="md"
+              >
+                <Navbar />
+                <RouterProvider router={router} />
+              </AppShell>
+            </HydrationBoundary>
+          </QueryClientProvider>
+        </MantineProvider>
+      </Html>
+    </StrictMode>
   );
 };
 

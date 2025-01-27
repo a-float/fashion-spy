@@ -1,15 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
+import { fetchProfile } from "ui/query";
 
 export function useUser() {
   const userQuery = useQuery({
-    queryKey: ["auth"],
+    queryKey: ["user"],
     refetchOnWindowFocus: false,
-    queryFn: async () => {
-      const res = await eden.api.profile.get();
-      if (res.error) throw res.error;
-      return res.data;
-    },
+    refetchOnMount: false,
+    queryFn: () => fetchProfile(),
   });
 
   const loginMutation = useMutation({

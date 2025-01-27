@@ -152,7 +152,6 @@ const ItemCard = (props: ItemCardProps) => {
 
   return (
     <Paper
-      shadow="sm"
       radius="md"
       withBorder={!!props.isTracked}
       h="100%"

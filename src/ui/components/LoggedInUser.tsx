@@ -1,5 +1,6 @@
 import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
 import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
+import { Link } from "ui/router/router";
 import { useUser } from "ui/hooks/useUser";
 
 const LoggedInUser = () => {
@@ -25,8 +26,8 @@ const LoggedInUser = () => {
       <Menu.Dropdown>
         {!!user.isAdmin && (
           <Menu.Item
-            component="a"
-            href="/admin"
+            component={Link}
+            to="/admin"
             leftSection={<IconLock size={16} />}
           >
             Admin panel
@@ -35,7 +36,9 @@ const LoggedInUser = () => {
         <Menu.Item
           leftSection={<IconLogout size={16} />}
           color="red"
-          onClick={() => logoutMutation.mutate()}
+          onClick={() => {
+            logoutMutation.mutate(), history.pushState({}, "", "/");
+          }}
         >
           Logout
         </Menu.Item>

@@ -10,6 +10,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
+import { fetchUsers } from "ui/query";
 
 type User = NonNullable<
   Awaited<ReturnType<typeof eden.api.users.get>>["data"]
@@ -83,11 +84,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
 const AdminPage = () => {
   const userQuery = useQuery({
     queryKey: ["users"],
-    queryFn: async () => {
-      const res = await eden.api.users.get();
-      if (res.error) throw res.error;
-      return res.data;
-    },
+    queryFn: fetchUsers,
   });
 
   if (!userQuery.data) return null;
