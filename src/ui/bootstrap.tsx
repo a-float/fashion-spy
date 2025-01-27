@@ -2,6 +2,9 @@
 /// <reference lib="dom.iterable" />
 
 import { hydrateRoot } from "react-dom/client";
-import App from "./App";
+import App, { type AppProps } from "./App";
 
-hydrateRoot(document, <App {...window.__INITIAL_DATA__} />);
+const appProps = window.__INITIAL_DATA__ as AppProps;
+console.log({ appProps });
+
+hydrateRoot(document, <App {...appProps} />);

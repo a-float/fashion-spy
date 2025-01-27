@@ -15,6 +15,7 @@ import { eden } from "ui/eden";
 import ItemCard, { ItemCardProps } from "./ItemCard";
 import React from "react";
 import { IconHelp } from "@tabler/icons-react";
+import { fetchItems } from "ui/query";
 
 const storeColors: Record<ItemCardProps["store"], string> = {
   Vinted: "teal",
@@ -28,11 +29,7 @@ const Homepage = () => {
 
   const itemsQuery = useQuery({
     queryKey: ["items"],
-    queryFn: async () => {
-      const res = await eden.api.items.index.get();
-      if (res.error) throw res.error;
-      return res.data;
-    },
+    queryFn: () => fetchItems(),
     enabled: !!user,
   });
 

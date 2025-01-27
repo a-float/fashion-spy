@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import LoggedInUser from "./LoggedInUser";
+import { Link } from "ui/router/router";
 
 const Navbar = () => {
   const { setColorScheme } = useMantineColorScheme();
@@ -20,7 +21,7 @@ const Navbar = () => {
   return (
     <AppShell.Header>
       <Group justify="space-between" px="lg" align="center" h="100%">
-        <Anchor href="/" style={{ textDecoration: "none" }}>
+        <Anchor component={Link} to="/" style={{ textDecoration: "none" }}>
           <Text
             component="h1"
             size="xl"
