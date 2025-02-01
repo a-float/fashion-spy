@@ -20,12 +20,18 @@ export abstract class Extractor {
   abstract getPriceString($: CheerioAPI): string;
   abstract getDetails($: CheerioAPI): ItemData["details"];
 
+  private parseCurrency = (str: string) => {
+    if (str === "zł") return "PLN";
+    if (str === "€") return "EUR";
+    return str;
+  };
+
   async extractData(html: string): Promise<ItemData> {
     const $ = load(html);
     const priceStr = this.getPriceString($);
     const [amountStr, currencyStr] = priceStr.split(/\s+/);
     const amount = parseInt(amountStr.replaceAll(/[.,]/g, ""));
-    const currency = currencyStr === "zł" ? "PLN" : currencyStr;
+    const currency = this.parseCurrency(currencyStr);
 
     const imgSrc = this.getImgSrc($);
     if (!imgSrc) throw new Error("Could not find an image");

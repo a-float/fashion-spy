@@ -1,4 +1,4 @@
-import { Elysia, file } from "elysia";
+import { Cookie, Elysia, file } from "elysia";
 import { renderToReadableStream } from "react-dom/server";
 import { staticPlugin } from "@elysiajs/static";
 import { itemPlugin } from "plugins/item";
@@ -25,7 +25,13 @@ const getCSSLinks = async () => {
 
 const links = await getCSSLinks();
 
-const renderUI = async (location: string, token?: string) => {
+const renderUI = async (
+  location: string,
+  cookie: Record<string, Cookie<string | undefined>>
+) => {
+  const token = cookie.token?.value;
+  const colorScheme = cookie.colorScheme?.value;
+
   const queryClient = new QueryClient();
   const router = createAppRouter({ ctx: { queryClient, token } });
   await router.prefetchRoutesForPathname(location);
@@ -35,7 +41,7 @@ const renderUI = async (location: string, token?: string) => {
     dehydratedState,
     location,
   };
-  const app = <App {...ssrProps} />;
+  const app = <App {...ssrProps} colorScheme={colorScheme} />;
   const stream = await renderToReadableStream(app, {
     bootstrapModules: ["/public/bootstrap.js"],
     bootstrapScriptContent: `window.__INITIAL_DATA__ = ${JSON.stringify(
@@ -52,9 +58,7 @@ const app = new Elysia()
   // .use(authPlugin)
   .use(itemPlugin)
   .get("/favicon.ico", () => file("public/favicon.ico"))
-  .get("/*", ({ params, cookie: { token } }) =>
-    renderUI("/" + params["*"], token?.value)
-  )
+  .get("/*", ({ params, cookie }) => renderUI("/" + params["*"], cookie))
   .listen(3000);
 
 console.log(

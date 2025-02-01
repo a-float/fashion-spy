@@ -12,6 +12,7 @@ import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,
   ItemNotFound,
+  NoApplicableExtractorError,
   TooManyItems,
   UserDoesNotExist,
 } from "./item.errors";
@@ -28,7 +29,7 @@ export class ItemService {
 
   private async fetchItemData(url: string) {
     const extractor = this.extractors.find((e) => e.appliesTo(url));
-    if (!extractor) throw new UserDoesNotExist();
+    if (!extractor) throw new NoApplicableExtractorError();
 
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 

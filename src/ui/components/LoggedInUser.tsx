@@ -12,13 +12,12 @@ const LoggedInUser = () => {
     <Menu shadow="md" width={200}>
       <Menu.Target>
         <UnstyledButton>
-          <Group gap="xs">
-            <div>
-              <Text size="md" c="dimmed">
-                {user.username}
-              </Text>
-            </div>
-            <IconChevronDown size={16} />
+          <Group c="dimmed" gap="4">
+            <Text size="md">{user.username}</Text>
+            <IconChevronDown
+              size={16}
+              style={{ position: "relative", top: 2 }}
+            />
           </Group>
         </UnstyledButton>
       </Menu.Target>

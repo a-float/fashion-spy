@@ -11,13 +11,20 @@ import {
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import LoggedInUser from "./LoggedInUser";
 import { Link } from "ui/router/router";
+import { useCookies } from "react-cookie";
+
+export const COLOR_SCHEME_COOKIE = "colorScheme";
 
 const Navbar = () => {
+  const [, setCookies] = useCookies([COLOR_SCHEME_COOKIE]);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light");
   const toggleColorScheme = () => {
-    setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
+    const newValue = computedColorScheme === "dark" ? "light" : "dark";
+    setCookies("colorScheme", newValue);
+    setColorScheme(newValue);
   };
+
   return (
     <AppShell.Header>
       <Group justify="space-between" px="lg" align="center" h="100%">
@@ -35,7 +42,7 @@ const Navbar = () => {
         <Box flex="1" />
         <ActionIcon
           onClick={toggleColorScheme}
-          color="gray"
+          c="dimmed"
           variant="transparent"
           size="md"
           aria-label="Toggle color scheme"
