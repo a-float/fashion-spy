@@ -6,7 +6,6 @@ import path from "path";
 import fs from "node:fs/promises";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router/appRouter";
-import { getRouteForPathname } from "ui/router/router";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 
 await Bun.build({
@@ -27,23 +26,9 @@ const getCSSLinks = async () => {
 const links = await getCSSLinks();
 
 const renderUI = async (location: string, token?: string) => {
-  // const queryClient = new QueryClient();
-  // const memoryHistory = createMemoryHistory({ initialEntries: [location] });
-  // const router = createRouter({
-  //   context: { queryClient },
-  //   history: memoryHistory,
-  // });
-  // const route = getRouteApi("/");
-  // console.log({ route });
-
-  // const dehydratedState = dehydrate(queryClient);
-
-  const router = createAppRouter();
   const queryClient = new QueryClient();
-  router.ssrLocation = location;
-  router.context = { queryClient, token };
-  const route = getRouteForPathname(router, location)!;
-  await route?.loader?.(router.context);
+  const router = createAppRouter({ ctx: { queryClient, token } });
+  await router.prefetchRoutesForPathname(location);
   const dehydratedState = dehydrate(queryClient);
   const ssrProps: AppProps = {
     styleLinks: links,
