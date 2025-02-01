@@ -71,7 +71,7 @@ export const itemPlugin = new Elysia({ name: "item" })
       )
       .post(
         "/:itemId/updateStatus",
-        async ({ store, user, params, set, body }) => {
+        async ({ store, user, params, set }) => {
           const items = await store.ItemService.getVisibleItems({
             userId: user.id,
             itemId: params.itemId,

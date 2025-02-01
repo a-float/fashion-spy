@@ -2,6 +2,7 @@ import React from "react";
 import { Route } from "./Router";
 
 export const OutletContext = React.createContext<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   routes: Route<any>[];
   depth: number;
 } | null>(null);

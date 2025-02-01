@@ -2,6 +2,7 @@ import React from "react";
 import { Router } from "./Router";
 import { OutletContext } from "./Outlet";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RouterContext = React.createContext<{ router: Router<any> } | null>(null);
 
 type PushState = (typeof history)["pushState"];
@@ -31,7 +32,7 @@ export function RouterProvider<C>(props: {
     if (typeof window !== "undefined") setPathname(window.location.pathname);
   };
 
-  const handlePopState = (e: PopStateEvent) => {
+  const handlePopState = (_e: PopStateEvent) => {
     updatePathname();
   };
 

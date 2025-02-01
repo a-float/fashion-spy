@@ -33,7 +33,7 @@ export const sessions = sqliteTable("sessions", {
     .references(() => users.id),
 });
 
-export const sessionRelations = relations(sessions, ({ one, many }) => ({
+export const sessionRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],

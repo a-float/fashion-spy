@@ -24,8 +24,4 @@ export class ZaraExtractor extends Extractor {
       .text();
     return x;
   }
-
-  getDetails($: CheerioAPI) {
-    return {};
-  }
 }
