@@ -5,7 +5,7 @@ import { itemPlugin } from "plugins/item";
 import path from "path";
 import fs from "node:fs/promises";
 import App, { AppProps } from "ui/App";
-import { createAppRouter } from "ui/router/appRouter";
+import { createAppRouter } from "ui/router";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 
 await Bun.build({

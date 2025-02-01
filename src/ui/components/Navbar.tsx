@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import LoggedInUser from "./LoggedInUser";
-import { Link } from "ui/router/router";
+import { Link } from "ui/lib/routing";
 import { useCookies } from "react-cookie";
 
 export const COLOR_SCHEME_COOKIE = "colorScheme";

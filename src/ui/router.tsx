@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createRootRoute, createRoute, createRouter } from "ui/router/router";
+import { createRootRoute, createRoute, createRouter } from "ui/lib/routing";
 import AdminPage from "ui/routes/AdminPage";
 import Homepage from "ui/routes/Homepage";
 import {
