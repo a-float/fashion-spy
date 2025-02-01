@@ -2,10 +2,9 @@ import React from "react";
 
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
-export type Route<C extends unknown = unknown> = {
+export type Route<C = unknown> = {
   path: string;
   children: Route<C>[];
-  parent: null | Route<any>;
   component: React.FC;
   prefetcher?: (ctx: C) => Promise<void>;
   addChildren: (route: Route<C>[]) => void;
@@ -13,19 +12,16 @@ export type Route<C extends unknown = unknown> = {
 
 export type RootRoute<C> = Route<C> & {
   path: "";
-  parent: null;
 };
 
 export function createRoute<C = unknown>(
-  config: PartialBy<Omit<Route<C>, "addChildren" | "parent">, "children">
+  config: PartialBy<Omit<Route<C>, "addChildren">, "children">
 ): Route<C> {
   return {
     ...config,
     children: [],
-    parent: null,
     addChildren(routes) {
       routes.forEach((route) => {
-        route.parent = this;
         this.children.push(route);
       });
     },
@@ -79,7 +75,7 @@ export class Router<C = unknown> {
     let path = pathname;
     while (true) {
       for (const child of node.children) {
-        const r = new RegExp(`^${child.path}(\/|$)`);
+        const r = new RegExp(`^${child.path}(/|$)`);
         const m = path.match(r);
         if (m) {
           routes.push(child);

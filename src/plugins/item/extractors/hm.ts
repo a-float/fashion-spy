@@ -21,8 +21,4 @@ export class HmExtractor extends Extractor {
   getPriceString($: CheerioAPI): string {
     return $(`h1`).parent().next().next().text();
   }
-
-  getDetails($: CheerioAPI) {
-    return {};
-  }
 }

@@ -1,10 +1,11 @@
 import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
 import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
-import { Link } from "ui/lib/routing";
+import { Link, useRouter } from "ui/lib/routing";
 import { useUser } from "ui/hooks/useUser";
 
 const LoggedInUser = () => {
   const { user, logoutMutation } = useUser();
+  const { router } = useRouter();
 
   if (!user) return null;
 
@@ -36,7 +37,8 @@ const LoggedInUser = () => {
           leftSection={<IconLogout size={16} />}
           color="red"
           onClick={() => {
-            logoutMutation.mutate(), history.pushState({}, "", "/");
+            logoutMutation.mutate();
+            router.navigate("/");
           }}
         >
           Logout

@@ -7,7 +7,7 @@ const NotFound = () => {
     <Container ta="center" p="lg" my={"xl"}>
       <Title order={2}>404 Page Not Found</Title>
       <Text c="dimmed" size="md" mt="sm">
-        The page you are looking for doesn't exist.
+        The page you are looking for doesn&apos;t exist.
       </Text>
       <Group justify="center" mt="md">
         <Button

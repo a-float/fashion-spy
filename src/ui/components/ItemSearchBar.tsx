@@ -1,4 +1,4 @@
-import { Button, Group, TextInput, useProps } from "@mantine/core";
+import { Button, Group, TextInput } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
@@ -15,7 +15,7 @@ const ItemSearchBar = () => {
         try {
           new URL(value);
           return null;
-        } catch (e) {
+        } catch {
           return "Invalid item url.";
         }
       },

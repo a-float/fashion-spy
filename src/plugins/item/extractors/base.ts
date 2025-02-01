@@ -18,7 +18,9 @@ export abstract class Extractor {
   abstract getName($: CheerioAPI): string;
   abstract getImgSrc($: CheerioAPI): string;
   abstract getPriceString($: CheerioAPI): string;
-  abstract getDetails($: CheerioAPI): ItemData["details"];
+  getDetails(_$: CheerioAPI): ItemData["details"] {
+    return {};
+  }
 
   private parseCurrency = (str: string) => {
     if (str === "zł") return "PLN";

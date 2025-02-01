@@ -27,8 +27,4 @@ export class ReservedExtractor extends Extractor {
     const data = this.getDataScript($);
     return data.offers.price + " " + data.offers.priceCurrency;
   }
-
-  override getDetails($: CheerioAPI) {
-    return {};
-  }
 }
