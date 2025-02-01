@@ -1,13 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
-import { fetchProfile } from "ui/query";
+import { getFetchProfileOptions, queryKeys, STALE_TIME } from "ui/query";
 
 export function useUser() {
+  const queryClient = useQueryClient();
   const userQuery = useQuery({
-    queryKey: ["user"],
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    queryFn: () => fetchProfile(),
+    ...getFetchProfileOptions(),
+    staleTime: STALE_TIME,
   });
 
   const loginMutation = useMutation({
@@ -23,7 +22,10 @@ export function useUser() {
 
   const logoutMutation = useMutation({
     mutationFn: async () => await eden.api.logout.get(),
-    onSuccess: () => userQuery.refetch(),
+    onSuccess: () => {
+      queryClient.setQueryData(queryKeys.profile, null);
+      userQuery.refetch();
+    },
   });
 
   const signUpMutation = useMutation({

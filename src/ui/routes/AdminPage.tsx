@@ -1,16 +1,10 @@
-import {
-  AppShell,
-  Button,
-  Checkbox,
-  NumberInput,
-  Table,
-  Title,
-} from "@mantine/core";
+import { Button, Checkbox, NumberInput, Table, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { eden } from "ui/eden";
-import { fetchUsers } from "ui/query";
+import { useUser } from "ui/hooks/useUser";
+import { getFetchUsersOptions, STALE_TIME } from "ui/query";
 
 type User = NonNullable<
   Awaited<ReturnType<typeof eden.api.users.get>>["data"]
@@ -82,15 +76,17 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
 };
 
 const AdminPage = () => {
+  const { user } = useUser();
   const userQuery = useQuery({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
+    ...getFetchUsersOptions(),
+    enabled: !!user?.isAdmin,
+    staleTime: STALE_TIME,
   });
 
+  if (!user?.isAdmin) return "Unauthorized";
   if (!userQuery.data) return null;
-
   return (
-    <AppShell.Main>
+    <>
       <Title order={2} size="h3" my={"md"}>
         User management
       </Title>
@@ -111,7 +107,7 @@ const AdminPage = () => {
           ))}
         </Table.Tbody>
       </Table>
-    </AppShell.Main>
+    </>
   );
 };
 

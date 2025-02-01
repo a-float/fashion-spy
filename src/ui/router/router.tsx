@@ -1,37 +1,104 @@
 import React from "react";
 
-type Route<Context extends unknown = undefined> = {
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+type PushState = (typeof history)["pushState"];
+
+type Route<C extends unknown = unknown> = {
   path: string;
+  children: Route<C>[];
+  parent: null | Route<any>;
   component: React.FC;
-  loader?: (ctx: Context) => Promise<void>;
+  prefetcher?: (ctx: C) => Promise<void>;
+  addChildren: (route: Route<C>[]) => void;
 };
 
-export function getRouteForPathname<C = undefined>(
-  router: Router<C>,
-  pathname: string
-): undefined | Route<C> {
-  return (
-    router.routes
-      .filter((route) => {
-        const p = pathname.endsWith("/") ? pathname : pathname + "/";
-        return p.startsWith(route.path);
-      })
-      .at(-1) ?? router.notFoundRoute
-  );
+type RootRoute<C> = Route<C> & {
+  path: "";
+  parent: null;
+};
+
+export function createRoute<C = unknown>(
+  config: PartialBy<Omit<Route<C>, "addChildren" | "parent">, "children">
+): Route<C> {
+  return {
+    ...config,
+    children: [],
+    parent: null,
+    addChildren(routes) {
+      routes.forEach((route) => {
+        route.parent = this;
+        this.children.push(route);
+      });
+    },
+  };
 }
 
-type Router<Context extends unknown = undefined> = {
-  routes: Route<Context>[];
-  notFoundRoute?: Route<Context>;
-  ssrLocation?: string;
-} & (Context extends undefined ? {} : { context: Context });
-
-export function createRoute<C = undefined>(config: Route<C>): Route<C> {
-  return { ...config };
+export function createRootRoute<C = unknown>(
+  config: Omit<Parameters<typeof createRoute<C>>[0], "path">
+) {
+  return createRoute<C>({ ...config, path: "" }) as RootRoute<C>;
 }
 
-export function createRouter<C = undefined>(config: Router<C>): Router<C> {
-  return { ...config, routes: config.routes as Route<C>[] };
+class Router<C = unknown> {
+  constructor(
+    private state: {
+      rootRoute: RootRoute<C>;
+      notFoundComponent?: React.FC;
+      context: C;
+    }
+  ) {}
+
+  public async prefetchRoutesForPathname(pathname: string) {
+    const routes = this.getRoutesForPathname(pathname);
+    return Promise.all(
+      routes.map((r) =>
+        r.prefetcher ? r.prefetcher(this.state.context) : Promise.resolve()
+      )
+    );
+  }
+
+  private createNotFoundRoute(): Route<C> {
+    return createRoute({
+      component: this.state.notFoundComponent ?? (() => null),
+      path: "NOT_FOUND",
+    });
+  }
+
+  navigate(to: string) {
+    history.pushState({}, "", to);
+  }
+
+  getRoutesForPathname(pathname: string): Route<C>[] {
+    let node: Route<C> = this.state.rootRoute;
+    const routes = [node];
+    let path = pathname;
+    while (true) {
+      for (const child of node.children) {
+        const r = new RegExp(`^${child.path}(\/|$)`);
+        const m = path.match(r);
+        if (m) {
+          routes.push(child);
+          node = child;
+          path = pathname.replace(r, "");
+          continue;
+        }
+      }
+      break;
+    }
+    if (path === "" || path === "/") return routes;
+    return [...routes, this.createNotFoundRoute()];
+  }
+
+  public get notFoundComponent(): React.FC {
+    return this.state.notFoundComponent ?? (() => "Not found");
+  }
+}
+
+export function createRouter<C = unknown>(
+  config: ConstructorParameters<typeof Router<C>>[0]
+): Router<C> {
+  return new Router<C>(config);
 }
 
 type LinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
@@ -39,30 +106,43 @@ type LinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
 };
 
 export function Link({ to, ...rest }: LinkProps) {
+  const { router } = useRouter();
   return (
     <a
       {...rest}
       href={to}
       onClick={(e) => {
         e.preventDefault();
-        history.pushState({}, "", to);
+        router.navigate(to);
       }}
     />
   );
 }
 
-export function RouterProvider<Context = never>(props: {
-  router: Router<Context>;
+const RouterContext = React.createContext<{ router: Router<any> } | null>(null);
+
+export const useRouter = () => {
+  const ctx = React.use(RouterContext);
+  if (!ctx) throw new Error("Outlet must be used inside RouterProvider");
+  return ctx;
+};
+
+export function RouterProvider<C>(props: {
+  router: Router<C>;
+  staticPathname?: string;
 }): React.ReactNode {
+  if (typeof window === "undefined" && !props.staticPathname) {
+    throw new Error("statisPathname is required during ssr");
+  }
   const [pathname, setPathname] = React.useState<string>(
     typeof window !== "undefined"
-      ? window?.location.pathname
-      : props.router.ssrLocation ?? "/"
+      ? window.location.pathname
+      : props.staticPathname ?? "/" // TODO remove?
   );
-  const pushRef = React.useRef<(typeof history)["pushState"]>(null);
+  const pushRef = React.useRef<PushState>(null);
 
-  const updatePathname = (pathane?: string) => {
-    if (pathane) return setPathname(pathane);
+  const updatePathname = (pathname?: string) => {
+    if (pathname) return setPathname(pathname);
     if (typeof window !== "undefined") setPathname(window.location.pathname);
   };
 
@@ -70,20 +150,14 @@ export function RouterProvider<Context = never>(props: {
     updatePathname();
   };
 
-  const handleHistoryPush: (typeof history)["pushState"] = (
-    data,
-    unused,
-    url
-  ) => {
+  const handleHistoryPush: PushState = (data, unused, url) => {
     if (typeof url === "string") setPathname(url);
     else if (url) setPathname(url.pathname);
   };
 
   React.useEffect(() => {
     pushRef.current = window.history.pushState;
-    window.history.pushState = (
-      ...args: Parameters<(typeof history)["pushState"]>
-    ) => {
+    window.history.pushState = (...args: Parameters<PushState>) => {
       handleHistoryPush(...args);
       if (pushRef.current) pushRef.current.apply(window.history, args);
     };
@@ -95,8 +169,39 @@ export function RouterProvider<Context = never>(props: {
     };
   }, []);
 
-  const route = getRouteForPathname(props.router, pathname);
-  const Component = route?.component || (() => "Not found");
+  const routes = props.router.getRoutesForPathname(pathname);
+  const Component = routes[0].component;
 
-  return <Component />;
+  return (
+    <RouterContext.Provider value={{ router: props.router }}>
+      <OutletContext.Provider value={{ routes, depth: 1 }}>
+        <Component />
+      </OutletContext.Provider>
+    </RouterContext.Provider>
+  );
+}
+
+const useOutletContext = () => {
+  const ctx = React.use(OutletContext);
+  if (!ctx) throw new Error("Outlet must be used inside RouterProvider");
+  return ctx;
+};
+
+const OutletContext = React.createContext<{
+  routes: Route<any>[];
+  depth: number;
+} | null>(null);
+
+export function Outlet() {
+  const { routes, depth } = useOutletContext();
+  const route = routes.at(depth);
+  if (route) {
+    const Component = route.component;
+    return (
+      <OutletContext.Provider value={{ routes, depth: depth + 1 }}>
+        <Component />
+      </OutletContext.Provider>
+    );
+  }
+  console.warn(`Empty Outlet at depth ${depth}`);
 }

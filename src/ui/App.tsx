@@ -1,10 +1,4 @@
-import {
-  AppShell,
-  createTheme,
-  MantineProvider,
-  useProps,
-  virtualColor,
-} from "@mantine/core";
+import { createTheme, MantineProvider, virtualColor } from "@mantine/core";
 import Html from "./components/Html";
 import {
   DehydratedState,
@@ -12,7 +6,6 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import Navbar from "./components/Navbar";
 import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
 import { RouterProvider } from "ui/router/router";
@@ -37,8 +30,10 @@ const App = (props: AppProps) => {
   });
 
   const queryClient = new QueryClient();
-  const router = createAppRouter();
-  if (props.location) router.ssrLocation = props.location;
+  const router = createAppRouter({
+    ctx: { queryClient },
+    staticLocation: props.location,
+  });
 
   return (
     <StrictMode>
@@ -47,15 +42,7 @@ const App = (props: AppProps) => {
           <Notifications />
           <QueryClientProvider client={queryClient}>
             <HydrationBoundary state={props.dehydratedState}>
-              <AppShell
-                header={{ height: 60 }}
-                maw={1440}
-                mx="auto"
-                padding="md"
-              >
-                <Navbar />
-                <RouterProvider router={router} />
-              </AppShell>
+              <RouterProvider router={router} staticPathname={props.location} />
             </HydrationBoundary>
           </QueryClientProvider>
         </MantineProvider>
