@@ -1,6 +1,6 @@
 import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
 import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
-import { Link } from "ui/router/router";
+import { Link } from "ui/lib/routing";
 import { useUser } from "ui/hooks/useUser";
 
 const LoggedInUser = () => {

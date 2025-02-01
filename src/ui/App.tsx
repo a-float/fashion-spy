@@ -8,8 +8,8 @@ import {
 } from "@tanstack/react-query";
 import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
-import { RouterProvider } from "ui/router/router";
-import { createAppRouter } from "./router/appRouter";
+import { RouterProvider } from "ui/lib/routing";
+import { createAppRouter } from "ui/router";
 import { useCookies } from "react-cookie";
 import { COLOR_SCHEME_COOKIE } from "./components/Navbar";
 

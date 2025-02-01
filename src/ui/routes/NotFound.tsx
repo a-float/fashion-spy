@@ -1,5 +1,5 @@
 import { Container, Title, Group, Button, Text } from "@mantine/core";
-import { useRouter } from "ui/router/router";
+import { useRouter } from "ui/lib/routing";
 
 const NotFound = () => {
   const { router } = useRouter();
