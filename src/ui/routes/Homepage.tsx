@@ -2,12 +2,14 @@ import React from "react";
 import { ActionIcon, Chip, Grid, Group, HoverCard, Text } from "@mantine/core";
 import { IconHelp } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { flushSync } from "react-dom";
 import ItemCard, { ItemCardProps } from "ui/components/ItemCard";
 import ItemSearchBar from "ui/components/ItemSearchBar";
 import LoginForm from "ui/components/LoginForm";
 import { eden } from "ui/eden";
 import { useUser } from "ui/hooks/useUser";
 import { getFetchItemsOptions, STALE_TIME } from "ui/query";
+import { startViewTransition } from "ui/utils/viewTransition";
 
 const storeColors: Record<ItemCardProps["store"], string> = {
   Vinted: "teal",
@@ -37,7 +39,14 @@ const Homepage = () => {
   const [filters, setFilters] = React.useState<string[]>([]);
 
   const filterChips = (
-    <Chip.Group multiple value={filters} onChange={setFilters}>
+    <Chip.Group
+      multiple
+      value={filters}
+      onChange={(value) => {
+        console.log("Changing to ", value);
+        startViewTransition(() => flushSync(() => setFilters(value)));
+      }}
+    >
       {[...new Set(itemsQuery.data?.map((item) => item.store))].map((store) => (
         <Chip
           key={store}

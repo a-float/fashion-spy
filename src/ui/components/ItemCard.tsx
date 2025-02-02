@@ -24,6 +24,7 @@ import {
 } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
+import { startViewTransition } from "ui/utils/viewTransition";
 
 export type ItemCardProps = NonNullable<
   Awaited<ReturnType<typeof eden.api.items.index.get>>["data"]
@@ -59,7 +60,10 @@ const ItemCard = (props: ItemCardProps) => {
     },
     // TODO unify delete and update?
     // TODO group queryKeys?
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
+    onSuccess: () =>
+      startViewTransition(() =>
+        queryClient.invalidateQueries({ queryKey: ["items"] })
+      ),
     onError: (e) =>
       notifications.show({
         color: "red.5",
@@ -79,6 +83,7 @@ const ItemCard = (props: ItemCardProps) => {
 
     // TODO unify delete and update?
     // TODO group queryKeys?
+    // TODO notification when status actually changed
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
     onError: (e) =>
       notifications.show({
@@ -156,7 +161,10 @@ const ItemCard = (props: ItemCardProps) => {
       withBorder={!!props.isTracked}
       h="100%"
       pos={"relative"}
-      style={{ overflow: "hidden" }}
+      style={{
+        overflow: "hidden",
+        viewTransitionName: `item-card-${props.id}`,
+      }}
     >
       <LoadingOverlay
         visible={loading || updateStatusMutation.isPending}
