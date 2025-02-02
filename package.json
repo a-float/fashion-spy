@@ -10,36 +10,40 @@
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
     "@libsql/client": "^0.14.0",
-    "@mantine/core": "^7.15.3",
-    "@mantine/form": "^7.15.3",
-    "@mantine/hooks": "^7.15.3",
-    "@mantine/notifications": "^7.16.1",
-    "@tabler/icons-react": "^3.28.1",
-    "@tanstack/react-query": "^5.64.0",
+    "@mantine/core": "^7.16.2",
+    "@mantine/form": "^7.16.2",
+    "@mantine/hooks": "^7.16.2",
+    "@mantine/notifications": "^7.16.2",
+    "@tabler/icons-react": "^3.29.0",
+    "@tanstack/react-query": "^5.66.0",
     "cheerio": "^1.0.0",
     "croner": "^9.0.0",
-    "drizzle-orm": "^0.38.3",
+    "drizzle-orm": "^0.38.4",
     "drizzle-typebox": "^0.2.1",
     "elysia": "1.2.10",
     "elysia-rate-limit": "^4.1.0",
     "react": "^19.0.0",
     "react-cookie": "^7.2.2",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "@types/react": "^19.0.5",
+    "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "bun-types": "latest",
-    "drizzle-kit": "^0.30.1",
+    "drizzle-kit": "^0.30.4",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^15.14.0",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.1",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
     "typescript-eslint": "^8.22.0"
   },
-  "module": "src/index.js"
+  "module": "src/index.js",
+  "patchedDependencies": {
+    "elysia-rate-limit@4.1.0": "patches/elysia-rate-limit@4.1.0.patch"
+  }
 }

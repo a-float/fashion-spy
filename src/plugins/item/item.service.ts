@@ -7,6 +7,7 @@ import {
   SQL,
   sql,
 } from "drizzle-orm";
+import { logger } from "logger";
 import { db, table } from "db";
 import { Extractor, StoreName } from "./extractors/base";
 import {
@@ -35,10 +36,10 @@ export class ItemService {
 
     const onDev = process.env.BUN_ENV === "dev";
     if (onDev && (await cachedHtml.exists())) {
-      console.log(`Using cached response for ${url}`);
+      logger.debug(`Using cached response for ${url}`);
       return await extractor.extractData(await cachedHtml.text());
     } else {
-      console.log(`Fetching response for ${url}`);
+      logger.debug(`Fetching response for ${url}`);
       const res = await fetch(url, {
         headers: {
           "User-Agent":
@@ -66,7 +67,7 @@ export class ItemService {
     item: Awaited<ReturnType<typeof this.getVisibleItems>>[number]
   ) {
     const data = await this.fetchItemData(item.url).catch((e) => {
-      console.log(`Failed to update item[id=${item.id}], ${e}`);
+      logger.error(`Failed to update item[id=${item.id}], ${e}`);
       return {
         amount: null,
         currency: null,
@@ -81,14 +82,12 @@ export class ItemService {
       details: data.details,
     };
 
-    console.log({ newStatus });
     const shouldInsert =
       !lastStatus || this.hashStatus(lastStatus) !== this.hashStatus(newStatus);
 
     if (shouldInsert) {
       await db.insert(table.itemStatus).values(newStatus);
     } else {
-      console.log("updating status with id", lastStatus.id);
       await db
         .update(table.itemStatus)
         .set({
@@ -101,13 +100,13 @@ export class ItemService {
   async updateAllItemStatus() {
     // TODO use a logger with time
     const items = await this.getVisibleItems();
-    console.log(`Starting update of ${items.length} items at ...`);
+    logger.notice(`Starting update of ${items.length} items at ...`);
     for (const item of items) {
       await this.updateItemStatus(item);
       // rate limiting
       sleep(1000 + Math.random() * 1000);
     }
-    console.log(`Update done`);
+    logger.notice(`Update done`);
   }
 
   async deleteItem(userId: number, itemId: number) {
@@ -200,7 +199,6 @@ export class ItemService {
     const visibleUserItems = (
       await this.getVisibleItems({ userId: item.ownerId })
     ).length;
-    console.log({ visibleUserItems, item, data });
     if (
       !item.isTracked &&
       data.isTracked &&

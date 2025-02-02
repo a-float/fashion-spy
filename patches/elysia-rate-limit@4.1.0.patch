@@ -1,0 +1,12 @@
+diff --git a/dist/services/plugin.d.ts b/dist/services/plugin.d.ts
+index 2c79922fac3fb6416951470e2b1ae2396cfe2c85..6f59e03bd60584aec03dd8baf45054b5fd423c87 100644
+--- a/dist/services/plugin.d.ts
++++ b/dist/services/plugin.d.ts
+@@ -1,6 +1,6 @@
+ import Elysia from 'elysia';
+ import type { Options } from '../@types/Options';
+-export declare const plugin: (userOptions?: Partial<Options>) => (app: Elysia) => Elysia<"", false, {
++export declare const plugin: (userOptions?: Partial<Options>) => (app: Elysia) => Elysia<"", {
+     decorator: {};
+     store: {};
+     derive: {};

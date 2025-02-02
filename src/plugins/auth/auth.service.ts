@@ -1,5 +1,6 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-typebox";
+import { logger } from "logger";
 import { db, table } from "db";
 import {
   IncorrectCredentials,
@@ -64,7 +65,7 @@ export class AuthService {
         .set({ closedAt: sql`(current_timestamp)` })
         .where(eq(table.sessions.id, sessionId));
     } catch (e) {
-      console.log("Error while closing session", String(e));
+      logger.error("Error while closing session", String(e));
     }
   }
 }

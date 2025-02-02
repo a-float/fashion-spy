@@ -84,7 +84,6 @@ export const authPlugin = new Elysia()
       .put(
         "/users/:id",
         async ({ params: { id }, body, store }) => {
-          console.log({ id, body });
           await store.AuthService.updateUser(id, body);
           return { ok: true };
         },

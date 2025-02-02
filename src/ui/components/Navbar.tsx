@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ActionIcon,
   Anchor,
@@ -16,7 +17,7 @@ import LoggedInUser from "./LoggedInUser";
 export const COLOR_SCHEME_COOKIE = "colorScheme";
 
 const Navbar = () => {
-  const [, setCookies] = useCookies([COLOR_SCHEME_COOKIE]);
+  const [cookies, setCookies] = useCookies([COLOR_SCHEME_COOKIE]);
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light");
   const toggleColorScheme = () => {
@@ -24,6 +25,10 @@ const Navbar = () => {
     setCookies("colorScheme", newValue);
     setColorScheme(newValue);
   };
+
+  React.useEffect(() => {
+    if (!cookies.colorScheme) setCookies("colorScheme", computedColorScheme);
+  }, []);
 
   return (
     <AppShell.Header>
