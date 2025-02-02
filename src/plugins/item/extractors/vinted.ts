@@ -1,5 +1,5 @@
-import { Extractor } from "./base";
 import { CheerioAPI } from "cheerio";
+import { Extractor } from "./base";
 
 export class VintedExtractor extends Extractor {
   appliesTo(url: string): boolean {

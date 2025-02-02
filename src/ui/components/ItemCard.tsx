@@ -13,17 +13,17 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
-  IconTrash,
-  IconOutbound,
   IconEye,
   IconHanger,
-  IconRefresh,
   IconHeart,
+  IconOutbound,
+  IconRefresh,
+  IconTrash,
 } from "@tabler/icons-react";
-import { eden } from "ui/eden";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { notifications } from "@mantine/notifications";
+import { eden } from "ui/eden";
 
 export type ItemCardProps = NonNullable<
   Awaited<ReturnType<typeof eden.api.items.index.get>>["data"]

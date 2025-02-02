@@ -1,12 +1,12 @@
-import { Cookie, Elysia, file } from "elysia";
-import { renderToReadableStream } from "react-dom/server";
-import { staticPlugin } from "@elysiajs/static";
-import { itemPlugin } from "plugins/item";
-import path from "path";
 import fs from "node:fs/promises";
+import { staticPlugin } from "@elysiajs/static";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { Cookie, Elysia, file } from "elysia";
+import path from "path";
+import { renderToReadableStream } from "react-dom/server";
+import { itemPlugin } from "plugins/item";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router";
-import { dehydrate, QueryClient } from "@tanstack/react-query";
 
 await Bun.build({
   entrypoints: ["./src/ui/bootstrap.tsx"],

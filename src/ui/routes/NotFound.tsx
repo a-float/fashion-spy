@@ -1,4 +1,4 @@
-import { Container, Title, Group, Button, Text } from "@mantine/core";
+import { Button, Container, Group, Text, Title } from "@mantine/core";
 import { useRouter } from "ui/lib/routing";
 
 const NotFound = () => {

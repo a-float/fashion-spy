@@ -1,4 +1,3 @@
-import { db, table } from "db";
 import {
   and,
   desc,
@@ -8,6 +7,7 @@ import {
   SQL,
   sql,
 } from "drizzle-orm";
+import { db, table } from "db";
 import { Extractor, StoreName } from "./extractors/base";
 import {
   ItemAlreadyExistsError,

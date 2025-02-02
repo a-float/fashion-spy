@@ -1,17 +1,17 @@
+import { StrictMode } from "react";
 import { createTheme, MantineProvider, virtualColor } from "@mantine/core";
-import Html from "./components/Html";
+import { Notifications } from "@mantine/notifications";
 import {
   DehydratedState,
   HydrationBoundary,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { Notifications } from "@mantine/notifications";
-import { StrictMode } from "react";
+import { useCookies } from "react-cookie";
+import Html from "ui/components/Html";
+import { COLOR_SCHEME_COOKIE } from "ui/components/Navbar";
 import { RouterProvider } from "ui/lib/routing";
 import { createAppRouter } from "ui/router";
-import { useCookies } from "react-cookie";
-import { COLOR_SCHEME_COOKIE } from "./components/Navbar";
 
 export type AppProps = {
   styleLinks: string[];

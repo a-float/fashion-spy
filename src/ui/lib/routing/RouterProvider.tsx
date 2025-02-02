@@ -1,6 +1,6 @@
 import React from "react";
-import { Router } from "./Router";
 import { OutletContext } from "./Outlet";
+import { Router } from "./Router";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RouterContext = React.createContext<{ router: Router<any> } | null>(null);

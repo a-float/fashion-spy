@@ -1,7 +1,7 @@
-import { Group, Text, Menu, UnstyledButton } from "@mantine/core";
+import { Group, Menu, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
-import { Link, useRouter } from "ui/lib/routing";
 import { useUser } from "ui/hooks/useUser";
+import { Link, useRouter } from "ui/lib/routing";
 
 const LoggedInUser = () => {
   const { user, logoutMutation } = useUser();
