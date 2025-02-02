@@ -1,4 +1,11 @@
-import { Button, Checkbox, NumberInput, Table, Title } from "@mantine/core";
+import {
+  Button,
+  Checkbox,
+  NumberInput,
+  ScrollArea,
+  Table,
+  Title,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -90,23 +97,25 @@ const AdminPage = () => {
       <Title order={2} size="h3" my={"md"}>
         User management
       </Title>
-      <Table>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Username</Table.Th>
-            <Table.Th>isAdmin</Table.Th>
-            <Table.Th>isActive</Table.Th>
-            <Table.Th>Max Items</Table.Th>
-            <Table.Th>Created At</Table.Th>
-            <Table.Th>Actions</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {userQuery.data.map((user) => (
-            <AdminTableUserRow key={user.id} user={user} />
-          ))}
-        </Table.Tbody>
-      </Table>
+      <ScrollArea>
+        <Table style={{ minWidth: 550 }} mb="md">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>Username</Table.Th>
+              <Table.Th>isAdmin</Table.Th>
+              <Table.Th>isActive</Table.Th>
+              <Table.Th>Max Items</Table.Th>
+              <Table.Th>Created At</Table.Th>
+              <Table.Th>Actions</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {userQuery.data.map((user) => (
+              <AdminTableUserRow key={user.id} user={user} />
+            ))}
+          </Table.Tbody>
+        </Table>
+      </ScrollArea>
     </>
   );
 };
