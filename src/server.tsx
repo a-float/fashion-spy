@@ -1,8 +1,10 @@
 import fs from "node:fs/promises";
+import { URL } from "node:url";
 import { staticPlugin } from "@elysiajs/static";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { Cron } from "croner";
 import { Cookie, Elysia, file } from "elysia";
+import { rateLimit } from "elysia-rate-limit";
 import path from "path";
 import { renderToReadableStream } from "react-dom/server";
 import { backupDatabase } from "db/backup";
@@ -56,6 +58,19 @@ const renderUI = async (
 
 const app = new Elysia()
   .use(staticPlugin())
+  .use(
+    rateLimit({
+      errorResponse: "Too many requests",
+      duration: 60 * 1000,
+      max: 600, // a lot
+      skip: (req) => {
+        const url = new URL(req.url);
+        if (process.env.BUN_ENV === "dev") return true;
+        // only count api requests
+        return url.pathname.startsWith("/api");
+      },
+    }) as (app: Elysia) => Elysia // I shouldn't need that cast
+  )
   .state("backupDatabaseCron", new Cron("5 */12 * * *", backupDatabase))
   // TODO why auth routes ignored when item plugin registered
   // .use(authPlugin)
