@@ -1,3 +1,4 @@
+import React from "react";
 import { Group, Menu, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronDown, IconLock, IconLogout } from "@tabler/icons-react";
 import { useUser } from "ui/hooks/useUser";
@@ -6,11 +7,12 @@ import { Link, useRouter } from "ui/lib/routing";
 const LoggedInUser = () => {
   const { user, logoutMutation } = useUser();
   const { router } = useRouter();
+  const [opened, setOpened] = React.useState(false);
 
   if (!user) return null;
 
   return (
-    <Menu shadow="md" width={200}>
+    <Menu shadow="md" width={200} opened={opened} onChange={setOpened}>
       <Menu.Target>
         <UnstyledButton>
           <Group c="dimmed" gap="4">
@@ -28,6 +30,7 @@ const LoggedInUser = () => {
           <Menu.Item
             component={Link}
             to="/admin"
+            onClick={() => setOpened(false)}
             leftSection={<IconLock size={16} />}
           >
             Admin panel

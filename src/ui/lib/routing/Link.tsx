@@ -12,6 +12,7 @@ export function Link({ to, ...rest }: LinkProps) {
       href={to}
       onClick={(e) => {
         e.preventDefault();
+        rest.onClick?.(e);
         router.navigate(to);
       }}
     />
