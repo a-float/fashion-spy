@@ -1,17 +1,17 @@
 import {
   ActionIcon,
+  Anchor,
   AppShell,
-  Text,
   Box,
   Group,
+  Text,
   useComputedColorScheme,
   useMantineColorScheme,
-  Anchor,
 } from "@mantine/core";
-import { IconSun, IconMoon } from "@tabler/icons-react";
-import LoggedInUser from "./LoggedInUser";
-import { Link } from "ui/lib/routing";
+import { IconMoon, IconSun } from "@tabler/icons-react";
 import { useCookies } from "react-cookie";
+import { Link } from "ui/lib/routing";
+import LoggedInUser from "./LoggedInUser";
 
 export const COLOR_SCHEME_COOKIE = "colorScheme";
 

@@ -1,7 +1,8 @@
-import globals from "globals";
 import pluginJs from "@eslint/js";
-import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -10,6 +11,7 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
+  { plugins: { "simple-import-sort": simpleImportSort } },
   {
     settings: {
       react: {
@@ -18,8 +20,8 @@ export default [
     },
   },
   {
-    // not necessary in React 19
     rules: {
+      // not necessary in React 19
       "react/jsx-uses-react": "off",
       "react/react-in-jsx-scope": "off",
       "no-unused-vars": "off",
@@ -32,6 +34,15 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
+      "simple-import-sort/imports": [
+        "error",
+        {
+          groups: [
+            ["^react$", "^node:", "^@?\\w", "^", "^(ui|plugins|db)", "^\\."],
+          ],
+        },
+      ],
+      "simple-import-sort/exports": "error",
     },
   },
   { ignores: ["public/*"] },

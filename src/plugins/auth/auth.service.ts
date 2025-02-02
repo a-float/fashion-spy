@@ -1,11 +1,11 @@
-import { db, table } from "db";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { createSelectSchema } from "drizzle-typebox";
+import { db, table } from "db";
 import {
-  UsernameAlreadyTaken,
   IncorrectCredentials,
   UserInactive,
+  UsernameAlreadyTaken,
 } from "./auth.errors";
-import { createSelectSchema } from "drizzle-typebox";
 
 const UserSchema = createSelectSchema(table.users);
 

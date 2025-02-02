@@ -1,11 +1,11 @@
 import {
-  TextInput,
-  PasswordInput,
   Button,
   Paper,
+  PasswordInput,
+  SegmentedControl,
   Stack,
   Text,
-  SegmentedControl,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useUser } from "ui/hooks/useUser";

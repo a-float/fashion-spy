@@ -1,14 +1,14 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRootRoute, createRoute, createRouter } from "ui/lib/routing";
-import AdminPage from "ui/routes/AdminPage";
-import Homepage from "ui/routes/Homepage";
 import {
   getFetchItemsOptions,
   getFetchProfileOptions,
   getFetchUsersOptions,
 } from "ui/query";
-import Root from "ui/routes/Root";
+import AdminPage from "ui/routes/AdminPage";
+import Homepage from "ui/routes/Homepage";
 import NotFound from "ui/routes/NotFound";
+import Root from "ui/routes/Root";
 
 type Context = {
   queryClient: QueryClient;

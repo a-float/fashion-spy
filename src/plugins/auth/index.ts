@@ -1,7 +1,7 @@
-import { Elysia, t } from "elysia";
-import { AuthService } from "./auth.service";
 import { createInsertSchema } from "drizzle-typebox";
+import { Elysia, t } from "elysia";
 import { table } from "db";
+import { AuthService } from "./auth.service";
 
 const _createUserSchema = createInsertSchema(table.users, {
   username: (schema) => t.String({ ...schema, minLength: 1 }),
