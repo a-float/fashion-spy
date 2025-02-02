@@ -1,9 +1,11 @@
 import fs from "node:fs/promises";
 import { staticPlugin } from "@elysiajs/static";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
+import { Cron } from "croner";
 import { Cookie, Elysia, file } from "elysia";
 import path from "path";
 import { renderToReadableStream } from "react-dom/server";
+import { backupDatabase } from "db/backup";
 import { itemPlugin } from "plugins/item";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router";
@@ -54,6 +56,7 @@ const renderUI = async (
 
 const app = new Elysia()
   .use(staticPlugin())
+  .state("backupDatabaseCron", new Cron("5 */12 * * *", backupDatabase))
   // TODO why auth routes ignored when item plugin registered
   // .use(authPlugin)
   .use(itemPlugin)

@@ -27,16 +27,14 @@ export const itemPlugin = new Elysia({ name: "item" })
   })
   .state((store) => ({
     ...store,
-    cron: {
-      updateStatus: new Cron("0 */2 * * *", () => {
-        store.ItemService.updateAllItemStatus();
-      }),
-    },
+    updateItemsCron: new Cron("0 */2 * * *", () => {
+      store.ItemService.updateAllItemStatus();
+    }),
   }))
   .group("/api/items", (app) =>
     app
       .get("/status", ({ store }) => ({
-        msToNext: store.cron.updateStatus.msToNext(),
+        msToNext: store.updateItemsCron.msToNext(),
       }))
       .get(
         "/",
