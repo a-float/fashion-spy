@@ -1,5 +1,6 @@
 import { CheerioAPI, load } from "cheerio";
 import { logger } from "logger";
+import sharp from "sharp";
 
 type ItemData = {
   name: string;
@@ -46,9 +47,11 @@ export abstract class Extractor {
     if (!(await imgFile.exists())) {
       logger.silly(`Fetching img from ${imgSrc}`);
       const imgRes = await fetch(imgSrc);
-      await Bun.write(imgFile, await imgRes.blob());
+      const resizedImg = await sharp(await imgRes.arrayBuffer())
+        .resize(600)
+        .toBuffer();
+      await Bun.write(imgFile, resizedImg.buffer);
     } else {
-      // TODO resize img
       logger.silly("Using cached img");
     }
 

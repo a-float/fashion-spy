@@ -98,7 +98,6 @@ export class ItemService {
   }
 
   async updateAllItemStatus() {
-    // TODO use a logger with time
     const items = await this.getVisibleItems();
     logger.notice(`Starting update of ${items.length} items at ...`);
     for (const item of items) {
