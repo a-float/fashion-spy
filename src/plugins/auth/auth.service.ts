@@ -10,6 +10,12 @@ import {
 
 const UserSchema = createSelectSchema(table.users);
 
+export function generateCryptoString(length: number = 32): string {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Buffer.from(array).toString("hex");
+}
+
 export class AuthService {
   async login(body: { username: string; password: string }) {
     const user = await db.query.users.findFirst({
@@ -19,7 +25,7 @@ export class AuthService {
       throw new IncorrectCredentials();
     }
     if (!user.isActive) throw new UserInactive();
-    const key = crypto.getRandomValues(new Uint32Array(1))[0];
+    const key = generateCryptoString();
     await db.insert(table.sessions).values({
       id: key,
       userId: user.id,
@@ -41,7 +47,7 @@ export class AuthService {
   async getSession(sessionId: string) {
     return await db.query.sessions.findFirst({
       where: and(
-        eq(table.sessions.id, parseInt(sessionId)),
+        eq(table.sessions.id, sessionId),
         isNull(table.sessions.closedAt)
       ),
       with: { user: true },
@@ -58,7 +64,7 @@ export class AuthService {
     });
   }
 
-  async endSession(sessionId: number) {
+  async endSession(sessionId: string) {
     try {
       await db
         .update(table.sessions)

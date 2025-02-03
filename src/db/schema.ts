@@ -25,7 +25,7 @@ export const userRelations = relations(users, ({ one, many }) => ({
 }));
 
 export const sessions = sqliteTable("sessions", {
-  id: int().primaryKey(),
+  id: text().primaryKey(),
   createdAt: currentTime(),
   closedAt: text(),
   userId: int()

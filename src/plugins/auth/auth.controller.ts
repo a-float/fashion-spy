@@ -64,7 +64,7 @@ export const authPlugin = new Elysia()
       )
       .get("/logout", async ({ store, cookie: { token } }) => {
         if (token && token.value) {
-          await store.AuthService.endSession(parseInt(token.value));
+          await store.AuthService.endSession(token.value);
           token.remove();
         }
         return { ok: true };
