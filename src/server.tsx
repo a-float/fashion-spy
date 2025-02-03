@@ -66,7 +66,7 @@ const app = new Elysia()
       max: 240,
       skip: (req) => {
         const url = new URL(req.url);
-        if (process.env.BUN_ENV === "dev") return true;
+        if (process.env.NODE_ENV === "dev") return true;
         // only count api requests
         return url.pathname.startsWith("/api");
       },

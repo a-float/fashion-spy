@@ -5,7 +5,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/server.tsx",
     "lint": "eslint .",
-    "build": "bun build --compile --minify --sourcemap ./src/server.tsx --outfile app"
+    "build": "bun build --minify --sourcemap ./src/server.tsx --target bun --outfile fashion-spy-app.js",
+    "analyze": "bunx source-map-explorer ./public/bootstrap.js --no-border-checks --html result.html"
   },
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
@@ -42,6 +43,7 @@
     "postcss": "^8.5.1",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
+    "source-map-explorer": "^2.5.3",
     "typescript-eslint": "^8.22.0"
   },
   "module": "src/index.js",
