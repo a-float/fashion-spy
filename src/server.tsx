@@ -7,7 +7,7 @@ import { logger, loggerPlugin } from "logger";
 import path from "path";
 import { renderToReadableStream } from "react-dom/server";
 import { backupDatabase } from "db/backup";
-import { itemPlugin } from "plugins/item";
+import { itemPlugin } from "plugins/item/item.controller";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router";
 

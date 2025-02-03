@@ -2,7 +2,7 @@ import { Cron } from "croner";
 import { createUpdateSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { table } from "db";
-import { authPlugin } from "plugins/auth";
+import { authPlugin } from "plugins/auth/auth.controller";
 import { HmExtractor } from "./extractors/hm";
 import { ReservedExtractor } from "./extractors/reserved";
 import { VintedExtractor } from "./extractors/vinted";
