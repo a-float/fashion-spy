@@ -64,6 +64,7 @@ export const useDeleteItemMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       notifications.show({
+        color: "violet.5",
         message: "Item deleted succesfully",
       });
     },
@@ -71,6 +72,7 @@ export const useDeleteItemMutation = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.items });
       notifications.show({
         title: "Oops",
+        color: "red",
         message: "Failed to delete item. Try again later?",
       });
     },
