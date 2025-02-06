@@ -15,6 +15,7 @@ jobs:
           bun-version: latest
       - name: Install dependencies and build
         run: |
+          echo "NODE_ENV=production" > .env
           bun install
           bun run build
       - name: Deploy to server
@@ -24,7 +25,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "public/*,server.js"
+          source: "*,!node_modules,!.env,"
           target: ${{ secrets.APP_DIR }}
       - name: Cleanup
         run: rm -f private_key

@@ -38,7 +38,7 @@ const App = (props: AppProps) => {
     staticLocation: props.location,
   });
 
-  const defaultColorScheme = props.colorScheme || cookies.colorScheme;
+  const defaultColorScheme = props.colorScheme || cookies.colorScheme || "dark";
 
   return (
     <StrictMode>

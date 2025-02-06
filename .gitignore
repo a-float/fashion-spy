@@ -4,6 +4,7 @@ public/bootstrap.js
 cache
 public/img
 public/*.css
+!public/global.css
 *.db
 .env
 

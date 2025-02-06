@@ -22,9 +22,9 @@ if (process.env.NODE_ENV !== "production") {
 
 const getCSSLinks = async () => {
   const publicPath = path.resolve("public");
-  const cssFiles = (await fs.readdir(publicPath)).filter(
-    (file) => file.includes("styles") && file.endsWith(".css")
-  );
+  const cssFiles = (await fs.readdir(publicPath))
+    .filter((file) => file.endsWith(".css"))
+    .filter((file) => !file.includes("styles"));
   return cssFiles.map((file) => `/public/${file}`);
 };
 

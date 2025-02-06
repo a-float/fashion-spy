@@ -39,6 +39,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
       form.reset();
       notifications.show({
         title: "Success",
+        color: "violet.5",
         message: "User has been updated successfully",
       });
     },
