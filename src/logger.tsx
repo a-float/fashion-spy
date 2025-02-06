@@ -24,12 +24,22 @@ export const logger = winston.createLogger({
 
 const ignoreRegex = /^\/(public|favicon.ico)/;
 
-export const loggerPlugin = new Elysia({ name: "logger" }).onBeforeHandle(
-  { as: "global" },
-  ({ request }) => {
+export const loggerPlugin = new Elysia({ name: "logger" })
+  .derive(({ request }) => {
+    return {
+      log: {
+        route(level: "info" | "warn" | "error", message?: string) {
+          const pathname = new URL(request.url).pathname;
+          const method = request.method;
+          logger[level](`${method} ${pathname}${message ? " " + message : ""}`);
+        },
+      },
+    };
+  })
+  .onBeforeHandle({ as: "global" }, ({ request, log }) => {
     const url = new URL(request.url);
     const pathname = url.pathname + url.search;
     if (ignoreRegex.test(pathname)) return;
-    logger.info(`${request.method} ${pathname}`);
-  }
-);
+    log?.route("info");
+  })
+  .as("plugin");

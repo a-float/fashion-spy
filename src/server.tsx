@@ -59,6 +59,13 @@ const renderUI = async (
 const app = new Elysia()
   .use(staticPlugin())
   .use(loggerPlugin)
+  .onError(({ code, error, log }) => {
+    log?.route("error", error.toString());
+    if (code === "VALIDATION") {
+      return error.validator.Errors(error.value).First().message;
+    }
+    return "Oops. Something went wrong.";
+  })
   .use(
     rateLimit({
       errorResponse: "Too many requests",

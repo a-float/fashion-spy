@@ -1,6 +1,7 @@
 import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { table } from "db";
+import { AuthServiceError } from "./auth.errors";
 import { AuthService } from "./auth.service";
 
 const _createUserSchema = createInsertSchema(table.users, {
@@ -40,6 +41,12 @@ export const authPlugin = new Elysia()
         throw (set.status = "Unauthorized");
       },
     }),
+  })
+  .onError(({ error, set }) => {
+    if (error instanceof AuthServiceError) {
+      set.status = 400;
+      return error.message;
+    }
   })
   .group("/api", (app) =>
     app

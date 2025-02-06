@@ -1,4 +1,6 @@
-export abstract class ItemServiceError extends Error {}
+export abstract class ItemServiceError extends Error {
+  name = "ItemServiceError";
+}
 
 export class ItemAlreadyExistsError extends ItemServiceError {
   constructor() {

@@ -1,4 +1,6 @@
-export abstract class AuthServiceError extends Error {}
+export abstract class AuthServiceError extends Error {
+  name = "AuthServiceError";
+}
 
 export class UsernameAlreadyTaken extends AuthServiceError {
   constructor() {
