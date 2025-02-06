@@ -12,11 +12,13 @@ import { itemPlugin } from "plugins/item/item.controller";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router";
 
-await Bun.build({
-  entrypoints: ["./src/ui/bootstrap.tsx"],
-  outdir: "./public",
-  minify: true,
-});
+if (process.env.NODE_ENV !== "production") {
+  await Bun.build({
+    entrypoints: ["./src/ui/bootstrap.tsx"],
+    outdir: "./public",
+    minify: true,
+  });
+}
 
 const getCSSLinks = async () => {
   const publicPath = path.resolve("public");
@@ -87,7 +89,7 @@ const app = new Elysia()
   .listen(3000);
 
 logger.info(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port} in ${process.env.NODE_ENV} mode`
 );
 
 export type Server = typeof app;
