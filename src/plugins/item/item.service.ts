@@ -90,22 +90,20 @@ export class ItemService {
     } else {
       await db
         .update(table.itemStatus)
-        .set({
-          updatedAt: sql`(current_timestamp)`,
-        })
+        .set({ updatedAt: sql`(current_timestamp)` })
         .where(eq(table.itemStatus.id, lastStatus.id));
     }
   }
 
   async updateAllItemStatus() {
     const items = await this.getVisibleItems();
-    logger.notice(`Starting update of ${items.length} items at ...`);
+    logger.info(`Starting update of ${items.length} items at ...`);
     for (const item of items) {
       await this.updateItemStatus(item);
       // rate limiting
       sleep(1000 + Math.random() * 1000);
     }
-    logger.notice(`Update done`);
+    logger.info(`Update done`);
   }
 
   async deleteItem(userId: number, itemId: number) {

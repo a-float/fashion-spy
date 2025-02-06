@@ -7,7 +7,7 @@ import { HmExtractor } from "./extractors/hm";
 import { ReservedExtractor } from "./extractors/reserved";
 import { VintedExtractor } from "./extractors/vinted";
 import { ZaraExtractor } from "./extractors/zara";
-import { ItemServiceError } from "./item.errors";
+import { ItemNotFound, ItemServiceError } from "./item.errors";
 import { ItemService } from "./item.service";
 
 const _updateItemSchema = createUpdateSchema(table.items, {});
@@ -76,16 +76,13 @@ export const itemPlugin = new Elysia({ name: "item" })
       )
       .post(
         "/:itemId/updateStatus",
-        async ({ store, user, params, set }) => {
+        async ({ store, user, params }) => {
           const items = await store.ItemService.getVisibleItems({
             userId: user.id,
             itemId: params.itemId,
           });
           const item = items[0];
-          if (!item) {
-            set.status = "Bad Request";
-            return;
-          }
+          if (!item) throw new ItemNotFound();
           await store.ItemService.updateItemStatus(item);
           return { ok: true };
         },

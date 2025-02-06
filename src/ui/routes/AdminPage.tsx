@@ -39,7 +39,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
       form.reset();
       notifications.show({
         title: "Success",
-        message: "User data has been updated successfully",
+        message: "User has been updated successfully",
       });
     },
   });

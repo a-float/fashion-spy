@@ -13,7 +13,6 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import {
   IconEye,
   IconHanger,
@@ -22,85 +21,34 @@ import {
   IconRefresh,
   IconTrash,
 } from "@tabler/icons-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
-import { startViewTransition } from "ui/utils/viewTransition";
+import {
+  useDeleteItemMutation,
+  useUpdateItemMutation,
+  useUpdateStatusMutation,
+} from "ui/mutation";
 
 export type ItemCardProps = NonNullable<
   Awaited<ReturnType<typeof eden.api.items.index.get>>["data"]
->[number] & {
-  handleDelete: (itemId: number) => Promise<unknown>;
-};
-
-// const storeColors: Record<ItemCardProps["store"], string> = {
-//   Vinted: "teal",
-//   Zara: "dark",
-//   Reserved: "violet.7",
-//   "H&M": "red.7",
-// };
-
-const PURPLE = "#6c66c3";
+>[number];
 
 const ItemCard = (props: ItemCardProps) => {
-  const queryClient = useQueryClient();
-  const [loading, setLoading] = React.useState(false);
   const lastStatus = props.status.at(-1)!;
-  // const color = storeColors[props.store];
+  const updateStatusMutation = useUpdateStatusMutation();
+  const updateItemMutation = useUpdateItemMutation();
+  const deleteItemMutation = useDeleteItemMutation();
+
+  const isLoading =
+    deleteItemMutation.isPending || updateStatusMutation.isPending;
 
   const amountToString = (amount: number): string => {
     if (amount % 100 === 0) return String(amount / 100);
     return (amount / 100).toFixed(2);
   };
 
-  const updateHiddenMutation = useMutation({
-    mutationFn: async (body: { isTracked: 0 | 1 }) => {
-      const res = await eden.api.items({ itemId: props.id }).put(body);
-      if (res.error) throw res.error;
-      return res.data;
-    },
-    // TODO unify delete and update?
-    // TODO group queryKeys?
-    onSuccess: () =>
-      startViewTransition(() =>
-        queryClient.invalidateQueries({ queryKey: ["items"] })
-      ),
-    onError: (e) =>
-      notifications.show({
-        color: "red.5",
-        title: "Item update failed",
-        message: e.message,
-      }),
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async () => {
-      const res = await eden.api
-        .items({ itemId: props.id })
-        .updateStatus.post();
-      if (res.error) throw res.error;
-      return res.data;
-    },
-
-    // TODO unify delete and update?
-    // TODO group queryKeys?
-    // TODO notification when status actually changed
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["items"] }),
-    onError: (e) =>
-      notifications.show({
-        color: "red.5",
-        title: "Item status update failed",
-        message: e.message,
-      }),
-  });
-
-  const handleDelete = async () => {
-    setLoading(true);
-    await props.handleDelete(props.id);
-    setLoading(false);
-  };
-
-  const toggleHidden = async () =>
-    updateHiddenMutation.mutate({
+  const toggleIsTracked = async () =>
+    updateItemMutation.mutate({
+      itemId: props.id,
       isTracked: props.isTracked ? 0 : 1,
     });
 
@@ -110,7 +58,7 @@ const ItemCard = (props: ItemCardProps) => {
         <ActionIcon
           style={{ zIndex: 75 }}
           variant="filled"
-          color={PURPLE}
+          color={"violet.5"}
           aria-label="Settings"
           pos={"absolute"}
           right={6}
@@ -123,13 +71,16 @@ const ItemCard = (props: ItemCardProps) => {
 
       <Menu.Dropdown>
         <Menu.Label>Item</Menu.Label>
-        <Menu.Item leftSection={<IconEye size={14} />} onClick={toggleHidden}>
+        <Menu.Item
+          leftSection={<IconEye size={14} />}
+          onClick={toggleIsTracked}
+        >
           {props.isTracked ? "Pause tracking" : "Resume tracking"}
         </Menu.Item>
         {!!props.isTracked && (
           <Menu.Item
             leftSection={<IconRefresh size={14} />}
-            onClick={() => updateStatusMutation.mutate()}
+            onClick={() => updateStatusMutation.mutate({ itemId: props.id })}
           >
             Update item status
           </Menu.Item>
@@ -147,7 +98,7 @@ const ItemCard = (props: ItemCardProps) => {
         <Menu.Item
           color="red"
           leftSection={<IconTrash size={14} />}
-          onClick={handleDelete}
+          onClick={() => deleteItemMutation.mutate({ itemId: props.id })}
         >
           Delete
         </Menu.Item>
@@ -167,18 +118,14 @@ const ItemCard = (props: ItemCardProps) => {
       }}
     >
       <LoadingOverlay
-        visible={loading || updateStatusMutation.isPending}
+        visible={isLoading}
         zIndex={1000}
-        loaderProps={{ color: PURPLE }}
+        loaderProps={{ color: "violet.5" }}
         overlayProps={{ blur: 2 }}
       />
-      {!props.isTracked ? (
-        <Overlay color="#000" backgroundOpacity={0.3} blur={3} zIndex={50}>
-          {/* <Text ta="center" mt={150} size={"lg"} c="light">
-            Tracking paused
-          </Text> */}
-        </Overlay>
-      ) : null}
+      {props.isTracked ? null : (
+        <Overlay color="#000" backgroundOpacity={0.3} blur={3} zIndex={50} />
+      )}
       <Flex direction={"column"}>
         <Box h={{ base: 240, xs: 350 }} pos="relative">
           <Image src={props.imagePath} h="100%" alt="" />

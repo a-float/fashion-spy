@@ -1,12 +1,11 @@
 import React from "react";
 import { ActionIcon, Chip, Grid, Group, HoverCard, Text } from "@mantine/core";
 import { IconHelp } from "@tabler/icons-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { flushSync } from "react-dom";
 import ItemCard, { ItemCardProps } from "ui/components/ItemCard";
 import ItemSearchBar from "ui/components/ItemSearchBar";
 import LoginForm from "ui/components/LoginForm";
-import { eden } from "ui/eden";
 import { useUser } from "ui/hooks/useUser";
 import { getFetchItemsOptions, STALE_TIME } from "ui/query";
 import { startViewTransition } from "ui/utils/viewTransition";
@@ -20,23 +19,13 @@ const storeColors: Record<ItemCardProps["store"], string> = {
 
 const Homepage = () => {
   const { user } = useUser();
+  const [filters, setFilters] = React.useState<string[]>([]);
 
   const itemsQuery = useQuery({
     ...getFetchItemsOptions(),
     enabled: !!user,
     staleTime: STALE_TIME,
   });
-
-  const deleteItemMutation = useMutation({
-    mutationFn: async (itemId: number) => {
-      const res = await eden.api.items({ itemId }).delete();
-      if (res.error) throw res.error;
-      return res.data;
-    },
-    onSuccess: () => itemsQuery.refetch(),
-  });
-
-  const [filters, setFilters] = React.useState<string[]>([]);
 
   const filterChips = (
     <Chip.Group
@@ -105,10 +94,7 @@ const Homepage = () => {
           .toSorted((a, d) => d.isTracked - a.isTracked)
           .map((item) => (
             <Grid.Col key={item.id} span={{ base: 6, xs: 4, md: 3, lg: 2.4 }}>
-              <ItemCard
-                {...item}
-                handleDelete={deleteItemMutation.mutateAsync}
-              />
+              <ItemCard {...item} />
             </Grid.Col>
           ))}
       </Grid>

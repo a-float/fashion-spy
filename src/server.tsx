@@ -19,7 +19,6 @@ await Bun.build({
 });
 
 const getCSSLinks = async () => {
-  // TODO cache
   const publicPath = path.resolve("public");
   const cssFiles = (await fs.readdir(publicPath)).filter(
     (file) => file.includes("styles") && file.endsWith(".css")
@@ -27,7 +26,7 @@ const getCSSLinks = async () => {
   return cssFiles.map((file) => `/public/${file}`);
 };
 
-const links = await getCSSLinks();
+const cssLinks = await getCSSLinks();
 
 const renderUI = async (
   location: string,
@@ -41,7 +40,7 @@ const renderUI = async (
   await router.prefetchRoutesForPathname(location);
   const dehydratedState = dehydrate(queryClient);
   const ssrProps: AppProps = {
-    styleLinks: links,
+    styleLinks: cssLinks,
     dehydratedState,
     location,
   };
@@ -80,7 +79,7 @@ const app = new Elysia()
     })
   )
   .state("backupDatabaseCron", new Cron("5 */12 * * *", backupDatabase))
-  // TODO why auth routes ignored when item plugin registered
+  // TODO Elysia issue - why auth routes ignored when item plugin registered
   // .use(authPlugin)
   .use(itemPlugin)
   .get("/favicon.ico", () => file("public/favicon.ico"))

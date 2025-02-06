@@ -4,7 +4,7 @@ import { logger } from "logger";
 const MAX_BACKUPS = 16;
 
 export async function backupDatabase() {
-  logger.notice("Starting database backup");
+  logger.info("Starting database backup");
   // Set database and backup directory
   const DB_PATH = process.env.DB_PATH;
   const BACKUP_DIR = process.env.DB_BACKUP_DIR;
@@ -18,7 +18,7 @@ export async function backupDatabase() {
 
   // Perform the backup
   await $`sqlite3 ${DB_PATH} ".backup '${BACKUP_FILE}'"`;
-  logger.notice(`Backup completed: ${BACKUP_FILE}`);
+  logger.info(`Backup completed: ${BACKUP_FILE}`);
 
   // Keep only the last 10 backups, delete older ones
   const backups = (await $`ls -t ${BACKUP_DIR}/db_backup_*.sqlite`)

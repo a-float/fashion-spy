@@ -14,7 +14,6 @@ export class ReservedExtractor extends Extractor {
     return "Reserved" as const;
   }
 
-  // TODO store description?
   getName($: CheerioAPI): string {
     return this.getDataScript($).name;
   }

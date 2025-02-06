@@ -28,7 +28,7 @@ export const loggerPlugin = new Elysia({ name: "logger" })
   .derive(({ request }) => {
     return {
       log: {
-        route(level: "info" | "warn" | "error", message?: string) {
+        route(level: "info" | "warn" | "error" | "http", message?: string) {
           const pathname = new URL(request.url).pathname;
           const method = request.method;
           logger[level](`${method} ${pathname}${message ? " " + message : ""}`);
@@ -40,6 +40,6 @@ export const loggerPlugin = new Elysia({ name: "logger" })
     const url = new URL(request.url);
     const pathname = url.pathname + url.search;
     if (ignoreRegex.test(pathname)) return;
-    log?.route("info");
+    log?.route("http");
   })
   .as("plugin");
