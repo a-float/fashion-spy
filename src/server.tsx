@@ -60,7 +60,6 @@ const renderUI = async (
 };
 
 const app = new Elysia()
-  .use(staticPlugin())
   .use(loggerPlugin)
   .onError(({ code, error, log, set }) => {
     log?.route("error", error.toString());
@@ -76,6 +75,7 @@ const app = new Elysia()
     }
     return "Oops. Something went wrong.";
   })
+  .use(staticPlugin())
   .use(
     rateLimit({
       errorResponse: "Too many requests",
