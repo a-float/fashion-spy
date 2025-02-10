@@ -32,7 +32,7 @@ const ItemSearchBar = () => {
     },
     onSuccess: () => {
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["items"] });
+      queryClient.refetchQueries({ queryKey: ["items"] });
     },
   });
 

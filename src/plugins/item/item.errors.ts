@@ -31,3 +31,9 @@ export class ItemNotFound extends ItemServiceError {
     super("Item not found.");
   }
 }
+
+export class CantFetchStatusError extends ItemServiceError {
+  constructor() {
+    super(`Failed to fetch item. :(`);
+  }
+}

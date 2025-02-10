@@ -55,7 +55,6 @@ export const authPlugin = new Elysia()
         "/login",
         async ({ cookie: { token }, body, store, user }) => {
           if (!user) {
-            console.log("login to service");
             const key = await store.AuthService.login(body);
             token.value = key.toString();
           }

@@ -5,9 +5,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/server.tsx",
     "lint": "eslint .",
-    "build": "bun run build:client",
+    "build": "bun run build:client && bun run build:server",
     "migrate": "bunx drizzle-kit push",
-    "build:server": "bun build --minify ./src/server.tsx --target node --outdir public --env disable; mv public/server.js .",
+    "build:server": "bun build --minify ./src/server.tsx --target bun --outdir public --env disable; mv public/server.js .",
     "build:client": "bun build --minify ./src/ui/bootstrap.tsx --outdir public",
     "analyze": "bunx source-map-explorer ./public/bootstrap.js --no-border-checks --html result.html"
   },

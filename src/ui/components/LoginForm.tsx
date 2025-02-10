@@ -87,9 +87,11 @@ const LoginForm = () => {
             </Button>
           )}
         </Stack>
-        <Text mt="sm" c="green">
-          {statusMessage}
-        </Text>
+        {statusMessage && (
+          <Text mt="sm" c="green">
+            {statusMessage}
+          </Text>
+        )}
       </form>
     </Paper>
   );

@@ -11,6 +11,7 @@ import { logger } from "logger";
 import { db, table } from "db";
 import { Extractor, StoreName } from "./extractors/base";
 import {
+  CantFetchStatusError,
   ItemAlreadyExistsError,
   ItemNotFound,
   NoApplicableExtractorError,
@@ -51,7 +52,10 @@ export class ItemService {
           Connection: "keep-alive",
         },
       });
-      if (!res.ok) throw new Error(`Page returned ${res.status}`);
+      if (!res.ok) {
+        logger.error(`Page returned ${res.status}`);
+        throw new CantFetchStatusError();
+      }
       const html = await res.text();
       Bun.write(cachedHtml, html);
       return await extractor.extractData(html);

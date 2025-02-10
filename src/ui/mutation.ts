@@ -16,7 +16,7 @@ export const useUpdateItemMutation = () => {
     },
     onSuccess: () =>
       startViewTransition(() =>
-        queryClient.invalidateQueries({ queryKey: queryKeys.items })
+        queryClient.refetchQueries({ queryKey: queryKeys.items })
       ),
     onError: (e) =>
       notifications.show({
@@ -36,7 +36,7 @@ export const useUpdateStatusMutation = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.items });
+      queryClient.refetchQueries({ queryKey: queryKeys.items });
       notifications.show({
         color: "violet.5",
         title: "Success",
@@ -62,14 +62,14 @@ export const useDeleteItemMutation = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.items });
+      queryClient.refetchQueries({ queryKey: queryKeys.items });
       notifications.show({
         color: "violet.5",
         message: "Item deleted succesfully",
       });
     },
     onError: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.items });
+      queryClient.refetchQueries({ queryKey: queryKeys.items });
       notifications.show({
         title: "Oops",
         color: "red",
