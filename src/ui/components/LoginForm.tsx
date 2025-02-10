@@ -43,7 +43,7 @@ const LoginForm = () => {
 
   const error = loginMutation.error || signUpMutation.error;
   const statusMessage = signUpMutation.isSuccess
-    ? "Account created successfully."
+    ? "Account created successfully. Ask Mati to activate it in order to log in."
     : null;
 
   return (
@@ -87,7 +87,7 @@ const LoginForm = () => {
             </Button>
           )}
         </Stack>
-        <Text mt="sm" c={"green.5"}>
+        <Text mt="sm" c="green">
           {statusMessage}
         </Text>
       </form>

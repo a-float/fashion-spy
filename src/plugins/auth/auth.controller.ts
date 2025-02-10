@@ -1,7 +1,6 @@
 import { createInsertSchema } from "drizzle-typebox";
 import { Elysia, t } from "elysia";
 import { table } from "db";
-import { AuthServiceError } from "./auth.errors";
 import { AuthService } from "./auth.service";
 
 const _createUserSchema = createInsertSchema(table.users, {
@@ -42,12 +41,6 @@ export const authPlugin = new Elysia()
       },
     }),
   })
-  .onError(({ error, set }) => {
-    if (error instanceof AuthServiceError) {
-      set.status = 400;
-      return error.message;
-    }
-  })
   .group("/api", (app) =>
     app
       .post(
@@ -62,6 +55,7 @@ export const authPlugin = new Elysia()
         "/login",
         async ({ cookie: { token }, body, store, user }) => {
           if (!user) {
+            console.log("login to service");
             const key = await store.AuthService.login(body);
             token.value = key.toString();
           }

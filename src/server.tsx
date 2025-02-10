@@ -8,7 +8,9 @@ import { logger, loggerPlugin } from "logger";
 import path from "path";
 import { renderToReadableStream } from "react-dom/server";
 import { backupDatabase } from "db/backup";
+import { AuthServiceError } from "plugins/auth/auth.errors";
 import { itemPlugin } from "plugins/item/item.controller";
+import { ItemServiceError } from "plugins/item/item.errors";
 import App, { AppProps } from "ui/App";
 import { createAppRouter } from "ui/router";
 
@@ -60,8 +62,15 @@ const renderUI = async (
 const app = new Elysia()
   .use(staticPlugin())
   .use(loggerPlugin)
-  .onError(({ code, error, log }) => {
+  .onError(({ code, error, log, set }) => {
     log?.route("error", error.toString());
+    if (
+      error instanceof AuthServiceError ||
+      error instanceof ItemServiceError
+    ) {
+      set.status = 400;
+      return error.message;
+    }
     if (code === "VALIDATION") {
       return error.validator.Errors(error.value).First().message;
     }

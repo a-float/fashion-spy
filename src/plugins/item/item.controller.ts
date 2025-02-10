@@ -7,7 +7,7 @@ import { HmExtractor } from "./extractors/hm";
 import { ReservedExtractor } from "./extractors/reserved";
 import { VintedExtractor } from "./extractors/vinted";
 import { ZaraExtractor } from "./extractors/zara";
-import { ItemNotFound, ItemServiceError } from "./item.errors";
+import { ItemNotFound } from "./item.errors";
 import { ItemService } from "./item.service";
 
 const _updateItemSchema = createUpdateSchema(table.items, {});
@@ -32,12 +32,6 @@ export const itemPlugin = new Elysia({ name: "item" })
       store.ItemService.updateAllItemStatus();
     }),
   }))
-  .onError(({ error, set }) => {
-    if (error instanceof ItemServiceError) {
-      set.status = 400;
-      return error.message;
-    }
-  })
   .group("/api/items", (app) =>
     app
       .get("/status", ({ store }) => ({
