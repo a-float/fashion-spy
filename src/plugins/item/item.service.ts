@@ -36,7 +36,7 @@ export class ItemService {
 
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 
-    const onDev = process.env.NODE_ENV === "dev";
+    const onDev = process.env.NODE_ENV !== "production";
     if (onDev && (await cachedHtml.exists())) {
       logger.debug(`Using cached response for ${url}`);
       return await extractor.extractData(await cachedHtml.text());

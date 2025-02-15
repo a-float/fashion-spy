@@ -27,5 +27,18 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: "*,!node_modules,!.env,"
           target: ${{ secrets.APP_DIR }}
-      - name: Cleanup
-        run: rm -f private_key
+          overwrite:
+      - name: Install dependencies and restart app
+        uses: appleboy/ssh-action@master
+        with:
+          port: ${{ secrets.SSH_PORT }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH="$BUN_INSTALL/bin:$PATH"
+
+            cd /home/matt/fashion-spy
+            bun install --production 
+            pm2 restart fashion-spy --update-env
