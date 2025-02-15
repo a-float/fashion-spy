@@ -24,7 +24,7 @@ export function useUser() {
     mutationFn: async () => await eden.api.logout.get(),
     onSuccess: () => {
       queryClient.setQueryData(queryKeys.profile, null);
-      userQuery.refetch();
+      queryClient.removeQueries();
     },
   });
 
