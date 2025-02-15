@@ -34,6 +34,12 @@ export class ItemNotFound extends ItemServiceError {
 
 export class CantFetchStatusError extends ItemServiceError {
   constructor() {
-    super(`Failed to fetch item. :(`);
+    super(`Failed to fetch item.`);
+  }
+}
+
+export class ImABotError extends ItemServiceError {
+  constructor() {
+    super("Stopped by anti bot measures :(");
   }
 }

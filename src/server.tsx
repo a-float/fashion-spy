@@ -1,11 +1,9 @@
-import fs from "node:fs/promises";
 import { staticPlugin } from "@elysiajs/static";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { Cron } from "croner";
 import { Cookie, Elysia, file } from "elysia";
 import { rateLimit } from "elysia-rate-limit";
 import { logger, loggerPlugin } from "logger";
-import path from "path";
 import { renderToReadableStream } from "react-dom/server";
 import { backupDatabase } from "db/backup";
 import { AuthServiceError } from "plugins/auth/auth.errors";
@@ -23,11 +21,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const getCSSLinks = async () => {
-  const publicPath = path.resolve("public");
-  const cssFiles = (await fs.readdir(publicPath))
-    .filter((file) => file.endsWith(".css"))
-    .filter((file) => !file.includes("styles"));
-  return cssFiles.map((file) => `/public/${file}`);
+  return ["/public/bootstrap.css", "/public/global.css"];
 };
 
 const cssLinks = await getCSSLinks();

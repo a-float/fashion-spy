@@ -12,6 +12,7 @@ import { db, table } from "db";
 import { Extractor, StoreName } from "./extractors/base";
 import {
   CantFetchStatusError,
+  ImABotError,
   ItemAlreadyExistsError,
   ItemNotFound,
   NoApplicableExtractorError,
@@ -54,7 +55,8 @@ export class ItemService {
       });
       if (!res.ok) {
         logger.error(`Page returned ${res.status}`);
-        throw new CantFetchStatusError();
+        if (res.status === 403) throw new ImABotError();
+        else throw new CantFetchStatusError();
       }
       const html = await res.text();
       Bun.write(cachedHtml, html);
