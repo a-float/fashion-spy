@@ -92,7 +92,7 @@ const app = new Elysia()
   .listen(3000);
 
 logger.info(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port} in ${process.env.NODE_ENV} mode`
+  `🦊 Elysia is running at ${process.env.URL} (${app.server?.hostname}:${app.server?.port}) in ${process.env.NODE_ENV} mode`
 );
 
 export type Server = typeof app;

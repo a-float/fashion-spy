@@ -8,8 +8,8 @@
     "build": "bun run build:client && bun run build:server",
     "db:migrate": "bunx drizzle-kit push",
     "db:make-admin": "sqlite3 sqlite.db 'UPDATE users SET isActive = 1, isAdmin = 1 WHERE username = \"matt\"';",
-    "build:server": "bun build ./src/server.tsx --target bun --compile --outfile standalone --env disable",
-    "build:client": "bun build --minify ./src/ui/bootstrap.tsx --outdir public",
+    "build:server": "NODE_ENV=production bun build ./src/server.tsx --target bun --outdir public --env disable; mv ./public/server.js ./out.js",
+    "build:client": "NODE_ENV=production bun build --minify ./src/ui/bootstrap.tsx --outdir public",
     "analyze": "bunx source-map-explorer ./public/bootstrap.js --no-border-checks --html result.html"
   },
   "dependencies": {
