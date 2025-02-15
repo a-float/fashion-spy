@@ -69,7 +69,7 @@ const app = new Elysia()
     }
     return "Oops. Something went wrong.";
   })
-  .use(staticPlugin())
+  .use(staticPlugin({ alwaysStatic: false }))
   .use(
     rateLimit({
       errorResponse: "Too many requests",
