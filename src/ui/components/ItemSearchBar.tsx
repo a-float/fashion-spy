@@ -1,7 +1,8 @@
 import { Button, Group, TextInput } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
+import { getFetchStoresOptions, STALE_TIME } from "ui/query";
 
 const ItemSearchBar = () => {
   const form = useForm({
@@ -22,6 +23,22 @@ const ItemSearchBar = () => {
     },
   });
 
+  const storesQuery = useQuery({
+    ...getFetchStoresOptions(),
+    staleTime: STALE_TIME,
+    placeholderData: [],
+    select: (data) =>
+      data.filter((store) => !store.isDown).map((store) => store.name),
+  });
+
+  const inputDescription = !storesQuery.data?.length
+    ? undefined
+    : storesQuery.data?.length === 1
+    ? `The supported store is ${storesQuery.data[0]}`
+    : `The supported stores are ${storesQuery.data
+        .slice(0, -1)
+        .join(", ")} and ${storesQuery.data.at(-1)}`;
+
   const queryClient = useQueryClient();
 
   const addItemMutation = useMutation({
@@ -41,9 +58,10 @@ const ItemSearchBar = () => {
       <Group align="flex-start">
         <TextInput
           flex={1}
-          label="Item url"
+          label="Link to product page"
+          description={inputDescription}
           autoComplete="off"
-          placeholder="https://yout-favourite-online-shop/item/12341"
+          placeholder="https://your-favourite-online-shop/item/12341"
           required
           {...form.getInputProps("url")}
           error={form.errors.url || addItemMutation.error?.message}

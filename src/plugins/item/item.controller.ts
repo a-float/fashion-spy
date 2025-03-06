@@ -28,10 +28,25 @@ export const itemPlugin = new Elysia({ name: "item" })
   })
   .state((store) => ({
     ...store,
-    updateItemsCron: new Cron("0 */2 * * *", () => {
+    updateItemsCron: new Cron("0 */8 * * *", () => {
       store.ItemService.updateAllItemStatus();
     }),
   }))
+  .group("/api/stores", (app) =>
+    app
+      .get("/", ({ store }) => store.ItemService.getSupportedStoreNames())
+      .put(
+        "/",
+        async ({ store, body }) => {
+          await store.ItemService.updateStoreStatus(body.name, body.isDown);
+          return { ok: true };
+        },
+        {
+          isAdmin: true,
+          body: t.Object({ name: t.String(), isDown: t.Boolean() }),
+        }
+      )
+  )
   .group("/api/items", (app) =>
     app
       .get("/status", ({ store }) => ({

@@ -78,8 +78,8 @@ const Homepage = () => {
               </HoverCard.Target>
               <HoverCard.Dropdown>
                 <Text size="md">
-                  Every user can track only a limited number of items. Tracked
-                  items have their status updated every few hours.
+                  Every user can track a limited number of items. Tracked items
+                  have their status updated every few hours.
                 </Text>
               </HoverCard.Dropdown>
             </HoverCard>

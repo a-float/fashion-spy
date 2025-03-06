@@ -82,9 +82,15 @@ export const itemStatusRelations = relations(itemStatus, ({ one }) => ({
   }),
 }));
 
+export const stores = sqliteTable("store_status", {
+  name: text().primaryKey(),
+  isDown: int().notNull(),
+});
+
 export const table = {
   users,
   sessions,
+  stores,
   items,
   itemStatus,
 } as const;

@@ -15,6 +15,7 @@
   "dependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
+    "@elysiajs/swagger": "^1.2.2",
     "@libsql/client": "^0.14.0",
     "@mantine/core": "^7.16.2",
     "@mantine/form": "^7.16.2",

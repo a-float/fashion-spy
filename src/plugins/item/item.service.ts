@@ -30,6 +30,32 @@ type ItemStatus = InferInsertModel<typeof table.itemStatus>;
 export class ItemService {
   constructor(private extractors: Extractor[]) {}
 
+  // TODO extract to StoreService
+  async getSupportedStoreNames() {
+    const stores = await db.query.stores.findMany();
+    const storesDown = new Map(stores.map((s) => [s.name, s.isDown === 1]));
+    return this.extractors
+      .map((extractor) => extractor.getStoreName())
+      .map((name) => ({ name: name, isDown: storesDown.get(name) ?? false }));
+  }
+
+  // TODO extract to StoreService
+  async updateStoreStatus(storeName: string, isDown: boolean) {
+    const hasStore = await db.query.stores.findFirst({
+      where: eq(table.stores.name, storeName),
+    });
+    if (hasStore) {
+      await db
+        .update(table.stores)
+        .set({ isDown: Number(isDown) })
+        .where(eq(table.stores.name, storeName));
+    } else {
+      await db
+        .insert(table.stores)
+        .values({ name: storeName, isDown: Number(isDown) });
+    }
+  }
+
   private async fetchItemData(url: string) {
     const extractor = this.extractors.find((e) => e.appliesTo(url));
     if (!extractor) throw new NoApplicableExtractorError();

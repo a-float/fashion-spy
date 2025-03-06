@@ -1,4 +1,5 @@
 import { staticPlugin } from "@elysiajs/static";
+import swagger from "@elysiajs/swagger";
 import { dehydrate, QueryClient } from "@tanstack/react-query";
 import { Cron } from "croner";
 import { Cookie, Elysia, file } from "elysia";
@@ -54,6 +55,7 @@ const renderUI = async (
 };
 
 const app = new Elysia()
+  .use(swagger())
   .use(loggerPlugin)
   .onError(({ code, error, log, set }) => {
     log?.route("error", error.toString());

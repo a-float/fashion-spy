@@ -1,4 +1,6 @@
+import React from "react";
 import {
+  Accordion,
   Button,
   Checkbox,
   NumberInput,
@@ -8,10 +10,15 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { eden } from "ui/eden";
 import { useUser } from "ui/hooks/useUser";
-import { getFetchUsersOptions, STALE_TIME } from "ui/query";
+import {
+  getFetchStoresOptions,
+  getFetchUsersOptions,
+  queryKeys,
+  STALE_TIME,
+} from "ui/query";
 
 type User = NonNullable<
   Awaited<ReturnType<typeof eden.api.users.get>>["data"]
@@ -63,6 +70,7 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
       <Table.Td>
         <NumberInput
           {...form.getInputProps("maxTrackedItems")}
+          maw={"14ch"}
           min={1}
           max={100}
           step={1}
@@ -83,6 +91,53 @@ const AdminTableUserRow = ({ user }: { user: User }) => {
   );
 };
 
+type Store = NonNullable<
+  Awaited<ReturnType<typeof eden.api.stores.index.get>>["data"]
+>[number];
+
+const AdminTableStoreRow = ({ store }: { store: Store }) => {
+  const [isDown, setIsDown] = React.useState(store.isDown);
+  const queryClient = useQueryClient();
+  const updateStoreMutation = useMutation({
+    mutationFn: async () => {
+      await eden.api.stores.index.put({
+        name: store.name,
+        isDown: isDown,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.stores });
+      notifications.show({
+        title: "Success",
+        color: "violet.5",
+        message: "Store status has been updated successfully",
+      });
+    },
+  });
+
+  return (
+    <Table.Tr>
+      <Table.Td>{store.name}</Table.Td>
+      <Table.Td>
+        <Checkbox
+          checked={!isDown}
+          onChange={(e) => setIsDown(!e.target.checked)}
+        />
+      </Table.Td>
+      <Table.Td>
+        <Button
+          variant="light"
+          disabled={isDown === store.isDown}
+          loading={updateStoreMutation.isPending}
+          onClick={() => updateStoreMutation.mutate()}
+        >
+          Update
+        </Button>
+      </Table.Td>
+    </Table.Tr>
+  );
+};
+
 const AdminPage = () => {
   const { user } = useUser();
   const userQuery = useQuery({
@@ -91,33 +146,70 @@ const AdminPage = () => {
     staleTime: STALE_TIME,
   });
 
+  const storesQuery = useQuery({
+    ...getFetchStoresOptions(),
+    enabled: !!user?.isAdmin,
+    staleTime: STALE_TIME,
+  });
+
   if (!user?.isAdmin) return "Unauthorized";
   if (!userQuery.data) return null;
+  if (!storesQuery.data) return null;
   return (
-    <>
-      <Title order={2} size="h3" my={"md"}>
-        User management
-      </Title>
-      <ScrollArea>
-        <Table style={{ minWidth: 550 }} mb="md">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Username</Table.Th>
-              <Table.Th>isAdmin</Table.Th>
-              <Table.Th>isActive</Table.Th>
-              <Table.Th>Max Items</Table.Th>
-              <Table.Th>Created At</Table.Th>
-              <Table.Th>Actions</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {userQuery.data.map((user) => (
-              <AdminTableUserRow key={user.id} user={user} />
-            ))}
-          </Table.Tbody>
-        </Table>
-      </ScrollArea>
-    </>
+    <Accordion multiple>
+      <Accordion.Item value="stores">
+        <Accordion.Control icon="🏪">
+          <Title order={2} size="h3" my="sm">
+            Store management
+          </Title>
+        </Accordion.Control>
+        <Accordion.Panel>
+          <Table maw="30rem">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Store name</Table.Th>
+                <Table.Th>isActive</Table.Th>
+                <Table.Th w={0}>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {storesQuery.data.map((store) => (
+                <AdminTableStoreRow key={store.name} store={store} />
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item value="users">
+        <Accordion.Control icon="🙆‍♂️">
+          <Title order={2} size="h3" my="sm">
+            User management
+          </Title>
+        </Accordion.Control>
+        <Accordion.Panel>
+          <ScrollArea>
+            <Table miw={550} maw={1200}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Username</Table.Th>
+                  <Table.Th>isAdmin</Table.Th>
+                  <Table.Th>isActive</Table.Th>
+                  <Table.Th>Max Items</Table.Th>
+                  <Table.Th>Created At</Table.Th>
+                  <Table.Th w={0}>Actions</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {userQuery.data.map((user) => (
+                  <AdminTableUserRow key={user.id} user={user} />
+                ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
   );
 };
 
