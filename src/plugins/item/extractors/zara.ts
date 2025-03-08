@@ -19,9 +19,6 @@ export class ZaraExtractor extends Extractor {
   }
 
   getPriceString($: CheerioAPI): string {
-    const x = $("html")
-      .find(`[data-qa-qualifier="price-amount-current"]`)
-      .text();
-    return x;
+    return $("html").find(`[data-qa-qualifier="price-amount-current"]`).text();
   }
 }

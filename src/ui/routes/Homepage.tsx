@@ -15,6 +15,8 @@ const storeColors: Record<ItemCardProps["store"], string> = {
   Zara: "yellow.7",
   Reserved: "violet.7",
   "H&M": "red.7",
+  House: "orange",
+  Medicine: "grape",
 };
 
 const Homepage = () => {

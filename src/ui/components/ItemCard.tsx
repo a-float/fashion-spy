@@ -38,6 +38,8 @@ const ItemCard = (props: ItemCardProps) => {
   const updateItemMutation = useUpdateItemMutation();
   const deleteItemMutation = useDeleteItemMutation();
 
+  if (deleteItemMutation.isSuccess) return null;
+
   const isLoading =
     deleteItemMutation.isPending || updateStatusMutation.isPending;
 

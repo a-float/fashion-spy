@@ -17,7 +17,7 @@ const ItemSearchBar = () => {
           new URL(value);
           return null;
         } catch {
-          return "Invalid item url.";
+          return "Invalid product link.";
         }
       },
     },

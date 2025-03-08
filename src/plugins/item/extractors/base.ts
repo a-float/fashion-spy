@@ -11,7 +11,13 @@ type ItemData = {
   details: Record<string, string | number>;
 };
 
-export type StoreName = "Vinted" | "Zara" | "Reserved" | "H&M";
+export type StoreName =
+  | "Vinted"
+  | "Zara"
+  | "Reserved"
+  | "H&M"
+  | "House"
+  | "Medicine";
 
 export abstract class Extractor {
   abstract appliesTo(url: string): boolean;
@@ -34,7 +40,8 @@ export abstract class Extractor {
     const $ = load(html);
     const priceStr = this.getPriceString($);
     const [amountStr, currencyStr] = priceStr.split(/\s+/);
-    const amount = parseInt(amountStr.replaceAll(/[.,]/g, ""));
+    const amountF = parseFloat(amountStr.replaceAll(/[,]/g, "."));
+    const amount = Math.floor(amountF * 100);
     const currency = this.parseCurrency(currencyStr);
 
     const imgSrc = this.getImgSrc($);

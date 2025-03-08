@@ -4,6 +4,8 @@ import { Elysia, t } from "elysia";
 import { table } from "db";
 import { authPlugin } from "plugins/auth/auth.controller";
 import { HmExtractor } from "./extractors/hm";
+import { HouseExtractor } from "./extractors/house";
+import { MedicineExtractor } from "./extractors/medicine";
 import { ReservedExtractor } from "./extractors/reserved";
 import { VintedExtractor } from "./extractors/vinted";
 import { ZaraExtractor } from "./extractors/zara";
@@ -21,6 +23,8 @@ export const itemPlugin = new Elysia({ name: "item" })
       new ZaraExtractor(),
       new HmExtractor(),
       new ReservedExtractor(),
+      new HouseExtractor(),
+      new MedicineExtractor(),
     ])
   )
   .model({

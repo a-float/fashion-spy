@@ -58,7 +58,7 @@ export class ItemService {
 
   private async fetchItemData(url: string) {
     const extractor = this.extractors.find((e) => e.appliesTo(url));
-    if (!extractor) throw new NoApplicableExtractorError();
+    if (!extractor) throw new NoApplicableExtractorError(url);
 
     const cachedHtml = Bun.file(`./cache/${url.replaceAll("/", "-")}.html`);
 

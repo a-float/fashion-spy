@@ -15,8 +15,14 @@ export class TooManyItems extends ItemServiceError {
 }
 
 export class NoApplicableExtractorError extends ItemServiceError {
-  constructor() {
-    super("Url is not supported.");
+  constructor(url: string) {
+    let message = "Store not supported.";
+    try {
+      const host = new URL(url).hostname;
+      message = `Site ${host} is not supported.`;
+    } finally {
+      super(message);
+    }
   }
 }
 
