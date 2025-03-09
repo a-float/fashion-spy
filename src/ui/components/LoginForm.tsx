@@ -1,6 +1,5 @@
 import {
   Button,
-  Paper,
   PasswordInput,
   SegmentedControl,
   Stack,
@@ -47,53 +46,51 @@ const LoginForm = () => {
     : null;
 
   return (
-    <Paper maw={400} mx="auto" my="xl" withBorder p="lg" radius="lg">
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="lg">
-          <SegmentedControl
-            data={[
-              { label: "Login", value: "login" },
-              { label: "Sign Up", value: "signUp" },
-            ]}
-            {...form.getInputProps("action")}
-          />
-          <TextInput
-            label="Username"
-            placeholder="Enter your username"
-            type="username"
-            aria-required="true"
-            {...form.getInputProps("username")}
-            error={form.errors.username || error?.message}
-          />
-          <PasswordInput
-            label="Password"
-            placeholder="Enter your password"
-            aria-required="true"
-            {...form.getInputProps("password")}
-            error={form.errors.password}
-          />
-          {form.values.action === "login" ? (
-            <Button fullWidth type="submit" loading={loginMutation.isPending}>
-              Login
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              fullWidth
-              type="submit"
-              loading={signUpMutation.isPending}
-            >
-              Sign Up
-            </Button>
-          )}
-        </Stack>
-        {statusMessage && (
-          <Text mt="sm" c="green">
-            {statusMessage}
-          </Text>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Stack gap="lg">
+        <SegmentedControl
+          data={[
+            { label: "Login", value: "login" },
+            { label: "Sign Up", value: "signUp" },
+          ]}
+          {...form.getInputProps("action")}
+        />
+        <TextInput
+          label="Username"
+          placeholder="Enter your username"
+          type="username"
+          aria-required="true"
+          {...form.getInputProps("username")}
+          error={form.errors.username || error?.message}
+        />
+        <PasswordInput
+          label="Password"
+          placeholder="Enter your password"
+          aria-required="true"
+          {...form.getInputProps("password")}
+          error={form.errors.password}
+        />
+        {form.values.action === "login" ? (
+          <Button fullWidth type="submit" loading={loginMutation.isPending}>
+            Login
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            fullWidth
+            type="submit"
+            loading={signUpMutation.isPending}
+          >
+            Sign Up
+          </Button>
         )}
-      </form>
-    </Paper>
+      </Stack>
+      {statusMessage && (
+        <Text mt="sm" c="green">
+          {statusMessage}
+        </Text>
+      )}
+    </form>
   );
 };
 

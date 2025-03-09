@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { flushSync } from "react-dom";
 import ItemCard, { ItemCardProps } from "ui/components/ItemCard";
 import ItemSearchBar from "ui/components/ItemSearchBar";
-import LoginForm from "ui/components/LoginForm";
 import { useUser } from "ui/hooks/useUser";
 import { getFetchItemsOptions, STALE_TIME } from "ui/query";
 import { startViewTransition } from "ui/utils/viewTransition";
+import LoginPage from "./LoginPage";
 
 const storeColors: Record<ItemCardProps["store"], string> = {
   Vinted: "teal",
@@ -56,7 +56,7 @@ const Homepage = () => {
   ).length;
 
   return !user ? (
-    <LoginForm />
+    <LoginPage />
   ) : (
     <>
       <ItemSearchBar />

@@ -174,7 +174,7 @@ const ItemCard = (props: ItemCardProps) => {
             <br /> {lastStatus.updatedAt}
           </Text>
 
-          <Text size="sm" c="dimmed" lineClamp={1}>
+          <Text size="sm" c="dimmed" lineClamp={1} title={props.name}>
             {props.name}
           </Text>
           <Space flex={1} />

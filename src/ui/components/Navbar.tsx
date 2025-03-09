@@ -5,7 +5,6 @@ import {
   AppShell,
   Box,
   Group,
-  Text,
   useComputedColorScheme,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -13,6 +12,7 @@ import { IconMoon, IconSun } from "@tabler/icons-react";
 import { useCookies } from "react-cookie";
 import { Link } from "ui/lib/routing";
 import LoggedInUser from "./LoggedInUser";
+import Logo from "./Logo";
 
 export const COLOR_SCHEME_COOKIE = "colorScheme";
 
@@ -34,15 +34,7 @@ const Navbar = () => {
     <AppShell.Header>
       <Group justify="space-between" px="lg" align="center" h="100%">
         <Anchor component={Link} to="/" style={{ textDecoration: "none" }}>
-          <Text
-            component="h1"
-            size="xl"
-            fw={900}
-            variant="gradient"
-            gradient={{ from: "blue", to: "grape", deg: 145 }}
-          >
-            Fashion Spy
-          </Text>
+          <Logo size={"xl"} />
         </Anchor>
         <Box flex="1" />
         <ActionIcon
