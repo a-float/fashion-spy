@@ -25,19 +25,21 @@ const rootRoute = createRootRoute({
 const homeRoute = createRoute({
   component: Homepage,
   path: "/",
-  prefetcher: async (ctx: Context) => {
-    ctx.queryClient.prefetchQuery(getFetchStoresOptions(ctx.token));
-    ctx.queryClient.prefetchQuery(getFetchItemsOptions(ctx.token));
-  },
+  prefetcher: async (ctx: Context) =>
+    void Promise.allSettled([
+      ctx.queryClient.prefetchQuery(getFetchStoresOptions(ctx.token)),
+      ctx.queryClient.prefetchQuery(getFetchItemsOptions(ctx.token)),
+    ]),
 });
 
 const adminRoute = createRoute({
   component: AdminPage,
   path: "/admin",
-  prefetcher: async (ctx: Context) => {
-    ctx.queryClient.prefetchQuery(getFetchStoresOptions(ctx.token));
-    ctx.queryClient.prefetchQuery(getFetchUsersOptions(ctx.token));
-  },
+  prefetcher: async (ctx: Context) =>
+    void Promise.allSettled([
+      ctx.queryClient.prefetchQuery(getFetchStoresOptions(ctx.token)),
+      ctx.queryClient.prefetchQuery(getFetchUsersOptions(ctx.token)),
+    ]),
 });
 
 rootRoute.addChildren([homeRoute, adminRoute]);
